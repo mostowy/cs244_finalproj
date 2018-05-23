@@ -25,10 +25,10 @@ class entry(object):
         return elem
 
 class CuckooFilter(object):
-    def __init__(self, num_buckets, hash_family, finger_print, max_iters, size):
-        self.b1 = [entry(size) for i in range(num_buckets)]
-        self.b2 = [entry(size) for i in range(num_buckets)]
-        self.h  = hash_family.get()
+    def __init__(self, num_buckets, hash_family, finger_print, max_iters, buck_size):
+        self.b1 = [entry(buck_size) for i in range(num_buckets)]
+        self.b2 = [entry(buck_size) for i in range(num_buckets)]
+        self.h  = hash_family
         self.num_elems = 0
         self.finger_print = finger_print
         self.max_iters = max_iters
@@ -50,7 +50,7 @@ class CuckooFilter(object):
             ind = mod(ind, self.h(f))
             counter += 1
        return -1
-
+    
     def add(self, data):
         f = self.finger_print(data)
         ind1 = self.h(data)
