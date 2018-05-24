@@ -122,27 +122,32 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
   std::default_random_engine engine;
   engine.seed(kRandomSeed);
   auto gen = std::uniform_int_distribution<int>(0, numActions * kSpread);
-  auto coinFlip = std::bernoulli_distribution();
   
   HT table(bucket_val, buckets, family, family);
   std::unordered_set<int> reference;
   
-  for (size_t i = 0; i < numActions; i++) {
+  //for (size_t i = 0; i < numActions; i++) {
+  double total = 0;
+  double true_negs = 0;
+  double false_pos = 0;
+  while(true) {
     int value = gen(engine);
-    if ((reference.count(value) > 0) != table.contains(value)) {
-      return false;
+    reference.insert(value);
+    int val = table.insert(value);
+    if(val == -1){
+        break;
     }
-    if (coinFlip(engine)) {
-      reference.insert(value);
-      table.insert(value);      
-    } else {
-      reference.erase(value);
-      table.remove(value);
+    if ((reference.count(value) > 0) && !table.contains(value)) {
+      true_negs += 1;
     }
-    if ((reference.count(value) > 0) != table.contains(value)) {
-      return false;
+    if((reference.count(value) <= 0) && table.contains(value)) {
+      false_pos += 1;
     }
   }
+  std::cout<<"Filter Full After "<< total << " Elems."<<std::endl;
+  std::cout<<"Filter had "<<false_pos<<" false positive and "<<true_negs<<" true negatives."<<std::endl;
+  std::cout<<"False Positive Rate: "<<(false_pos/ total)<<std::endl;
+  std::cout<<"True Negative  Rate: "<<(true_negs/ total)<<std::endl;
   return true;
 }
 
