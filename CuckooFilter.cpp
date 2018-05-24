@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 #include <stdlib.h>
+#include <iostream>
 
 CuckooFilter::CuckooFilter(size_t numBuckets, size_t arr_size, std::shared_ptr<HashFamily> finger, std::shared_ptr<HashFamily> family) {
   
@@ -57,8 +58,9 @@ int CuckooFilter::run_cuckoo_loop(int f, int ind1, int ind2) {
 
 int CuckooFilter::insert(int data) {
   int f = finger_pointer(data);
-  int ind1 = h1(data);
-  int ind2 = ind1 ^ f;
+  int ind1 = h1(data) % numBucks;
+  int ind2 = (ind1 ^ f) % numBucks;
+  std::cout<<"Ind 1: "<<ind1<<" Ind 2: "<<ind2<<std::endl;
   if(b1[ind1]->has(f) || b2[ind2]->has(f))
     return 1;
   if(!b1[ind1]->full()){
@@ -74,9 +76,9 @@ int CuckooFilter::insert(int data) {
 
 bool CuckooFilter::contains(int data) const {
   int f = finger_pointer(data);
-  int ind1 = h1(f);
-  int ind2 = ind1 ^ f;
-  if(b1[ind1]->has(ind1) || b2[ind2]->has(ind2))
+  int ind1 = h1(f) % numBucks;
+  int ind2 = (ind1 ^ f) % numBucks;
+  if(b1[ind1]->has(f) || b2[ind2]->has(f))
       return true;
   return false;
 }
