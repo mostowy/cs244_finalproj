@@ -1,7 +1,8 @@
 #ifndef BucketsTable_Included
 #define BucketsTable_Included
 
-class BucketsTables{
+#include <stddef.h>
+class BucketsTable{
     public:
         /**
          * Constructor

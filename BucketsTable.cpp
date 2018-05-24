@@ -1,5 +1,5 @@
 #include "BucketsTable.h"
-
+#include <stddef.h>
 
 BucketsTable::BucketsTable(size_t numBuckets) {
     num_buckets = numBuckets;
@@ -15,21 +15,21 @@ bool BucketsTable::has(int f) {
     return false;
 }
 
-bool BucketTable::full() {
+bool BucketsTable::full() {
     return (num_elems >= num_buckets);
 }
 
-void BucketTable::add(int f) {
+void BucketsTable::add(int f) {
     // TODO: implement this
     num_elems += 1;
 }
 
-int BucketTable::evict_rand_and_replace(int f) {
+int BucketsTable::evict_rand_and_replace(int f) {
     // TODO: Implement this
     return f;
 }
 
-bool BucketTable::check_and_remove(int f) {
+bool BucketsTable::check_and_remove(int f) {
     // TODO: Implement this
     // for b:buckets
     //   num_elems != 1;

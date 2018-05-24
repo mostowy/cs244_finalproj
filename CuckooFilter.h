@@ -1,10 +1,11 @@
-#ifndef CuckooHashTable_Included
-#define CuckooHashTable_Included
+#ifndef CuckooFilter_Included
+#define CuckooFilter_Included
 
 #include "Hashes.h"
+#include "BucketsTable.h"
 #include <vector>
 
-class CuckooHashTable {
+class CuckooFilter {
  public:
   /**
    * Constructs a new cuckoo hash table with the specified number of buckets,
@@ -30,12 +31,12 @@ class CuckooHashTable {
    *
    * and assigning 'family' to it.
    */
-  CuckooHashTable(size_t numBuckets, std::shared_ptr<HashFamily> family);
+   CuckooFilter(size_t numBuckets, size_t arr_size, std::shared_ptr<HashFamily> finger, std::shared_ptr<HashFamily> family);
   
   /**
    * Cleans up all memory allocated by this hash table.
    */
-  ~CuckooHashTable();
+  ~CuckooFilter();
   
   /**
    * Inserts the specified element into this hash table. If the element already
@@ -79,8 +80,9 @@ private:
   std::vector<BucketsTable *> b1;
   std::vector<BucketsTable *> b2;
   HashFunction h1;
-  CuckooHashTable(CuckooHashTable const &) = delete;
-  void operator=(CuckooHashTable const &) = delete;
+  HashFunction finger_pointer;
+  CuckooFilter(CuckooFilter const &) = delete;
+  void operator=(CuckooFilter const &) = delete;
 };
 
 #endif

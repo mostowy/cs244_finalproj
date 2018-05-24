@@ -19,6 +19,8 @@ static const size_t kRandomSeed = 138;
  */
 static const size_t kSpread = 4;
 
+static const size_t bucket_val = 4;
+
 /**
  * Gather timing information for performing a certain number of actions.
  * The elements used are provided by the given generator.
@@ -122,7 +124,7 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
   auto gen = std::uniform_int_distribution<int>(0, numActions * kSpread);
   auto coinFlip = std::bernoulli_distribution();
   
-  HT table(buckets, family);
+  HT table(bucket_val, buckets, family, family);
   std::unordered_set<int> reference;
   
   for (size_t i = 0; i < numActions; i++) {

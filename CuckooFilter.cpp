@@ -3,14 +3,14 @@
 #include <math.h>
 #include <vector>
 #include <functional>
-#include <stdlib>
+#include <stdlib.h>
 
-CuckooFilter::CuckooFilter(size_t numBuckets, size_t arr_size, std::shard_ptr<HashFamily> finger, std::shared_ptr<HashFamily> family) {
+CuckooFilter::CuckooFilter(size_t numBuckets, size_t arr_size, std::shared_ptr<HashFamily> finger, std::shared_ptr<HashFamily> family) {
   
   // First set variables  
   numBucks = numBuckets;
   h1 = family->get();
-  finger_printer = finger->get();
+  finger_pointer = finger->get();
   num_max_cuckoos = 500;
   num_elems = 0;
 
@@ -56,10 +56,10 @@ int CuckooFilter::run_cuckoo_loop(int f, int ind1, int ind2) {
 }
 
 int CuckooFilter::insert(int data) {
-  int f = finger_printer(data);
+  int f = finger_pointer(data);
   int ind1 = h1(data);
   int ind2 = ind1 ^ f;
-  if(b1[ind1]->has(f) || b2[ind2].has(f))
+  if(b1[ind1]->has(f) || b2[ind2]->has(f))
     return 1;
   if(!b1[ind1]->full()){
     b1[ind1]->add(f);
@@ -73,16 +73,16 @@ int CuckooFilter::insert(int data) {
 }
 
 bool CuckooFilter::contains(int data) const {
-  int f = self.finger_print(data);
+  int f = finger_pointer(data);
   int ind1 = h1(f);
   int ind2 = ind1 ^ f;
-  if(b1[ind1]->has(ind1) || b2[ind2].has(ind2))
+  if(b1[ind1]->has(ind1) || b2[ind2]->has(ind2))
       return true;
   return false;
 }
 
 void CuckooFilter::remove(int data) {
-  int f = self.finger_print(data);
+  int f = finger_pointer(data);
   int ind1 = h1(f);
   int ind2 = ind1 ^ f;
   if(b1[ind1]->check_and_remove(f))
