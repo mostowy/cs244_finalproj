@@ -2,6 +2,8 @@
 #define BucketsTable_Included
 
 #include <stddef.h>
+#include <vector>
+
 class BucketsTable{
     public:
         /**
@@ -18,7 +20,7 @@ class BucketsTable{
          * Function returns true if table has finger print
          * false otherwise. 
          */
-        bool has(int f);
+        bool has(int f) const;
 
         /**
          * Function returns if buckets table is full
@@ -47,7 +49,8 @@ class BucketsTable{
     private:
         size_t num_elems;
         size_t num_buckets;
-        BucketsTable(BucketsTable const &) = delete;
+        std::vector<int> entries;
+        //BucketsTable(BucketsTable const &) = delete;
         void operator=(BucketsTable const &) = delete;
 };
 
