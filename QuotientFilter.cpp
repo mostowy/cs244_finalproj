@@ -46,12 +46,12 @@ int QuotientFilter::insert(int data) {
   int q_int = getqr(f, true);
   int r_int = getqr(f, false);
   size_t bucket = q_int % numBucks;
-  std::cout<<"BUCKET VALUE: "<<bucket<<std::endl;
+  //std::cout<<"BUCKET VALUE: "<<bucket<<std::endl;
 
   // If bucket empty, place.
   if(!isFilled(bucket)) {
-    std::cout<<"No Eviction"<<std::endl;
-    std::cout<<"INSERTING INTO: "<<bucket<<std::endl;
+    //std::cout<<"No Eviction"<<std::endl;
+    //std::cout<<"INSERTING INTO: "<<bucket<<std::endl;
     buckets[bucket] = r_int;
     set_3_bit(bucket, true, false, false);
     return 1;
@@ -95,7 +95,7 @@ int QuotientFilter::insert(int data) {
       bool temp_cont = stat_arr[(run_start * 3) + 1];
       if(!inserted){
         //std::cout<<"...."<<std::endl;
-        std::cout<<"INSERTING INTO: "<<run_start<<std::endl;
+        //std::cout<<"INSERTING INTO: "<<run_start<<std::endl;
         //std::cout<<"CLUSTER START: "<<cluster_start<<std::endl;
         //std::cout<<"BUCKET VAL: "<<bucket<<std::endl;
         //std::cout<<"RUNS BEFORE: "<<runs_before<<std::endl;
@@ -124,9 +124,9 @@ int QuotientFilter::insert(int data) {
         run_over = !stat_arr[(run_start*3) + 1]; // If cont false, run is over and we need to insert
   }
   
-  if(!inserted) {
-    std::cout<<"INSERTING INTO: "<<run_start<<std::endl;
-  }
+  //if(!inserted) {
+  //  std::cout<<"INSERTING INTO: "<<run_start<<std::endl;
+  //}
   
   // Insert
   buckets[run_start] = r_int;
@@ -146,7 +146,7 @@ bool QuotientFilter::contains(int data) const {
 
   // If connonical slot empty, return false
   if(stat_arr[bucket*3] == false){
-      std::cout<<"Connonical slot empty"<<std::endl;
+      //std::cout<<"Connonical slot empty"<<std::endl;
       return false;
   }
 
@@ -163,19 +163,19 @@ bool QuotientFilter::contains(int data) const {
 
     // If cluster_start is > numBucks, then saturated...
     if(cluster_start > numBucks){
-        std::cout<<"We are saturated..."<<std::endl;
-        return false;
+        //std::cout<<"We are saturated..."<<std::endl;
+        return linscan(data);
     }
         //std::cout<<"Cluster Start: "<<cluster_start<<std::endl;
     // Scan right now
     run_start = scan_right(cluster_start, runs_before);
     //run_start =cluster_start;
     started = run_start;
-    std::cout<<"AFTER SCAN LEFT IN CONTAINS: "<<std::endl;
-    std::cout<<"CLUSTER START: "<<cluster_start<<std::endl;
-    std::cout<<"RUNS BEFORE: "<<runs_before<<std::endl;
-    std::cout<<"BUCKET: "<<bucket<<std::endl;
-    std::cout<<"RUN START: "<<run_start<<std::endl;
+    //std::cout<<"AFTER SCAN LEFT IN CONTAINS: "<<std::endl;
+    //std::cout<<"CLUSTER START: "<<cluster_start<<std::endl;
+    //std::cout<<"RUNS BEFORE: "<<runs_before<<std::endl;
+    //std::cout<<"BUCKET: "<<bucket<<std::endl;
+    //std::cout<<"RUN START: "<<run_start<<std::endl;
   }
   //std::cout<<"RUN START: "<<run_start<<std::endl;  
   // Loop while still looking at non-empty spots
@@ -212,7 +212,7 @@ bool QuotientFilter::linscan(int data) const{
     //    std::cout<<"INDEX NOT FILLED: "<<i<<std::endl;
     //}
   }
-
+/*
   for(int j = 0; j < numBucks; j++) {
     std::string out  = "";
     out.resize(7);
@@ -225,7 +225,7 @@ bool QuotientFilter::linscan(int data) const{
       out.push_back(' ');
     }
     std::cout<<"Index "<<j<<": ["<<out<<"]"<<std::endl;
-  }
+  }*/
   return ret;
 }
 
