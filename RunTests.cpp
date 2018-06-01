@@ -11,10 +11,10 @@ int main() {
    * families can be used in any hash table type.
    */
   auto allHashFamilies  = {
-    twoIndependentHashFamily(),
-    threeIndependentHashFamily(),
-    fiveIndependentHashFamily(),
-    tabulationHashFamily()
+    //twoIndependentHashFamily(),
+    //threeIndependentHashFamily(),
+    fiveIndependentHashFamily()
+    //tabulationHashFamily()
   };
   
   /* A list of all types of hash functions available, including families with
@@ -31,7 +31,7 @@ int main() {
   };*/
 
   std::cout << "Correctness Tests" << std::endl;
-  std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  //std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   std::cout << std::endl;
 

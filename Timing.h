@@ -160,6 +160,7 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
   std::cout<<"Filter had "<<false_pos<<" false positive and "<<true_negs<<" true negatives."<<std::endl;
   std::cout<<"False Positive Rate: "<<(false_pos/ total)<<std::endl;
   std::cout<<"True Negative  Rate: "<<(true_negs/ total)<<std::endl;
+  //exit(0);
   return true;
 }
 
