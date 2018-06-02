@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Hashes.h"
+#include "BloomFilter.h"
 #include "CuckooFilter.h"
 #include "Timing.h"
 #include "QuotientFilter.h"
@@ -30,7 +31,32 @@ int main() {
     jenkinsHash()
   };*/
 
+  std::cout << "Sanity Checks" << std::endl;
+
+  std::cout << "  Hash functions are different:     ";
+  {
+    auto family = fiveIndependentHashFamily();
+    HashFunction h1 = family->get();
+    HashFunction h2 = family->get();
+    std::cout << (h1(4) != h2(4) ? "Pass" : "fail") << std::endl;
+  }
+
+  std::cout << "  Bloom filter basic functionality: ";
+  {
+    BloomFilter bf(1200, fiveIndependentHashFamily());
+    bf.insert(5);
+    bf.insert(2400);
+    if (!bf.contains(10) && bf.contains(5) && bf.contains(2400)) {
+      std::cout << "Pass";
+    } else {
+      std::cout << "fail";
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << std::endl;
   std::cout << "Correctness Tests" << std::endl;
+  std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   //std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   std::cout << std::endl;
