@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Hashes.h"
+#include "BlockedBloomFilter.h"
 #include "BloomFilter.h"
 #include "CuckooFilter.h"
 #include "Timing.h"
@@ -54,9 +55,23 @@ int main() {
     std::cout << std::endl;
   }
 
+  std::cout << "  Blocked Bloom filter basic functionality: ";
+  {
+    BlockedBloomFilter bbf(1200, fiveIndependentHashFamily());
+    bbf.insert(5);
+    bbf.insert(2400);
+    if (!bbf.contains(10) && bbf.contains(5) && bbf.contains(2400)) {
+      std::cout << "Pass";
+    } else {
+      std::cout << "fail";
+    }
+    std::cout << std::endl;
+  }
+
   std::cout << std::endl;
   std::cout << "Correctness Tests" << std::endl;
   std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  std::cout << "  Blocked Bloom:  " << (checkCorrectness<BlockedBloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   //std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   std::cout << std::endl;

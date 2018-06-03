@@ -29,10 +29,6 @@ void BitVector::set(size_t bit_index, bool value) {
   }
 }
 
-size_t BitVector::size() const {
-  return size_in_bits_;
-}
-
 BloomFilter::BloomFilter(size_t size_in_bits, std::shared_ptr<HashFamily> family,
                          int num_hash_funcs)
     : bit_vector_(size_in_bits),

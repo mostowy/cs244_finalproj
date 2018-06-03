@@ -10,7 +10,7 @@ class BitVector {
   ~BitVector();
   bool get(size_t bit_index) const;
   void set(size_t bit_index, bool value);
-  size_t size() const;
+  size_t size() const { return size_in_bits_; }
 
  private:
   size_t size_in_bits_;
@@ -25,8 +25,8 @@ class BloomFilter {
   BloomFilter(size_t size_in_bits, std::shared_ptr<HashFamily> family,
               int num_hash_funcs = 8);
   ~BloomFilter();
-  int insert(int key);
-  bool contains(int key) const;
+  int insert(int data);
+  bool contains(int data) const;
 
  private:
   BitVector bit_vector_;
