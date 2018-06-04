@@ -35,7 +35,7 @@ int main() {
 
   std::cout << "Sanity Checks" << std::endl;
 
-  std::cout << "  Hash functions are different:     ";
+/*  std::cout << "  Hash functions are different:     ";
   {
     auto family = fiveIndependentHashFamily();
     HashFunction h1 = family->get();
@@ -67,15 +67,15 @@ int main() {
       std::cout << "fail";
     }
     std::cout << std::endl;
-  }
+  }*/
 
   std::cout << std::endl;
   std::cout << "Correctness Tests" << std::endl;
-  //std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
-  //std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
-  //std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
-  //std::cout << "  Blocked Bloom:  " << (checkCorrectness<BlockedBloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
+  std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  std::cout << "  Blocked Bloom:  " << (checkCorrectness<BlockedBloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << std::endl;
 
   /* Test linear probing variants. */

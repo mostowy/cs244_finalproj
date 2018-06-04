@@ -132,7 +132,8 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
   std::cout<<"Num Buckets: "<<buckets<<std::endl;
   while(true) {
     //std::cout<<"Elem number: "<<total<<std::endl;
-    int value = gen(engine);
+    uint32_t value = gen(engine);
+    //std::cout<<"Inserting value: "<<value<<std::endl;
     int val = table.insert(value);
     if(val == -1){
         break;
@@ -140,12 +141,15 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
     reference.insert(value);
     if ((reference.count(value) > 0) && !table.contains(value)) {
       true_negs += 1;
+      //std::cout<<"TRUE NEG"<<std::endl;
+      //exit(0);
     }
     value = gen(engine);
     if((reference.count(value) <= 0) && table.contains(value)) {
       false_pos += 1;
     }
     total += 1;
+    //exit(0);
   }
   std::cout<<"Filter Full After "<< total << " Elems."<<std::endl;
   std::cout<<"Filter had "<<false_pos<<" false positive and "<<true_negs<<" true negatives."<<std::endl;
@@ -169,7 +173,7 @@ template <typename HT>
 bool checkCorrectness(std::initializer_list<std::shared_ptr<HashFamily>> families) {
   for (auto family: families) {
     if (!checkCorrectness<HT>({
-          std::make_tuple(30, family, 5),
+          std::make_tuple(12, family, 5),
             std::make_tuple(120, family, 50),
             std::make_tuple(12000, family, 5000)
             })) {
