@@ -1,7 +1,7 @@
 CXXFLAGS = -std=c++14 -Wall -Werror -O0 -g
 CXX = g++
 
-OBJECTS = RunTests.o Hashes.o CuckooFilter.o BucketsTable.o QuotientFilter.o SSPerm.o SemiSortTable.o SSCuckooFilter.o BloomFilter.o BlockedBloomFilter.o
+OBJECTS = RunTests.o Hashes.o CuckooFilter.o BucketsTable.o QuotientFilter.o SSPerm.o SemiSortTable.o SSCuckooFilter.o BloomFilter.o BlockedBloomFilter.o cityhash/src/city.o
 
 default: run-tests
 

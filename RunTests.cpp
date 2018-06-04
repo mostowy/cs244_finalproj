@@ -16,8 +16,9 @@ int main() {
   auto allHashFamilies  = {
     //twoIndependentHashFamily(),
     //threeIndependentHashFamily(),
-    fiveIndependentHashFamily()
+    //fiveIndependentHashFamily(),
     //tabulationHashFamily()
+    cityHash64()
   };
   
   /* A list of all types of hash functions available, including families with
@@ -30,12 +31,16 @@ int main() {
     fiveIndependentHashFamily(),
     tabulationHashFamily(),
     identityHash(),
-    jenkinsHash()
+    jenkinsHash(),
+    cityHash64()
   };*/
 
-  std::cout << "Sanity Checks" << std::endl;
+  std::cout << "Using hash family: " << (*allHashFamilies.begin())->name()
+            << std::endl;
 
-/*  std::cout << "  Hash functions are different:     ";
+/*  std::cout << "Sanity Checks" << std::endl;
+
+  std::cout << "  Hash functions are different:     ";
   {
     auto family = fiveIndependentHashFamily();
     HashFunction h1 = family->get();

@@ -69,6 +69,8 @@ public:
  *   jenkinsHash:
  *      A single hash function that's known to, in practice, have nice
  *      statistical dispersion.
+ *   cityHash64:
+ *      A family of CityHash64 hash functions using incrementing seeds.
  */
 std::shared_ptr<HashFamily> twoIndependentHashFamily();
 std::shared_ptr<HashFamily> threeIndependentHashFamily();
@@ -76,5 +78,6 @@ std::shared_ptr<HashFamily> fiveIndependentHashFamily();
 std::shared_ptr<HashFamily> tabulationHashFamily();
 std::shared_ptr<HashFamily> identityHash();
 std::shared_ptr<HashFamily> jenkinsHash();
+std::shared_ptr<HashFamily> cityHash64();
 
 #endif

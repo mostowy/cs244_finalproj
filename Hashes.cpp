@@ -1,6 +1,7 @@
 #include "Hashes.h"
 #include <random>
 #include <array>
+#include "cityhash/src/city.h"
 
 static std::default_random_engine engine(137);
 
@@ -148,4 +149,26 @@ std::shared_ptr<HashFamily> jenkinsHash() {
   };
   
   return std::make_shared<JenkinsHashFamily>();
+}
+
+static uint64 nextCityHashSeed = 1;
+
+std::shared_ptr<HashFamily> cityHash64() {
+  class CityHash64Family: public HashFamily {
+  public:
+    virtual HashFunction get() const {
+      const uint64 seed = nextCityHashSeed++;
+      return [seed] (int key) {
+        const char* buf = (const char*) &key;
+        const uint64 result = CityHash64WithSeed(buf, sizeof(key), seed);
+        return (size_t) result;
+      };
+    }
+
+    virtual std::string name() const {
+      return "CityHash64";
+    }
+  };
+
+  return std::make_shared<CityHash64Family>();
 }
