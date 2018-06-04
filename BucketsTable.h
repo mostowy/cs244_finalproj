@@ -20,36 +20,52 @@ class BucketsTable{
          * Function returns true if table has finger print
          * false otherwise. 
          */
-        bool has(int f) const;
+        bool has(uint32_t f, int ind1, int ind2) const;
 
         /**
          * Function returns if buckets table is full
          */
-        bool full();
+        bool full(int ind);
 
         /**
          * Function adds given finger print
          */
-        void add(int f);
+        void add(uint32_t f, int ind);
 
         /**
          * Function picks a random element, replaces it 
          * with the given finger print, and returns the
          * evicted finger print
          */
-        int evict_rand_and_replace(int f);
+        uint32_t evict_rand_and_replace(uint32_t f, int ind);
 
         /**
          * Function checks if given element is in the table,
          * removes it if it is, and returns whether or not
          * the element was removed.
          */
-        bool check_and_remove(int f);
+        bool check_and_remove(uint32_t f, int ind);
+
+        bool check_val(uint32_t f, int ind) const;
+        /**
+         * Yes I know this is kind of hacky but this will
+         * be a bucket.  Set the bit field to be the
+         * finger print size.
+         */
+        struct buck_struct{
+            unsigned e1:32;
+            unsigned e2:32;
+            unsigned e3:32;
+            unsigned e4:32;
+            unsigned full:4;
+        };
 
     private:
         size_t num_elems;
         size_t num_buckets;
-        std::vector<int> entries;
+        int f_size;
+        int full_val;
+        struct buck_struct* buckets;
         //BucketsTable(BucketsTable const &) = delete;
         void operator=(BucketsTable const &) = delete;
 };

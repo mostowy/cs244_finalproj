@@ -77,8 +77,7 @@ private:
   size_t numBucks;
   size_t num_elems;
   int num_max_cuckoos;
-  std::vector<BucketsTable> b1;
-  std::vector<BucketsTable> b2;
+  BucketsTable buckets;
   HashFunction h1;
   HashFunction finger_pointer;
   CuckooFilter(CuckooFilter const &) = delete;
