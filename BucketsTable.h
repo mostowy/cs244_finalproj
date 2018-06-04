@@ -23,12 +23,14 @@ class BucketsTable{
         bool has(uint32_t f, int ind1, int ind2) const;
 
         /**
-         * Function returns if buckets table is full
+         * Function returns if bucket at given index is
+         * full
          */
         bool full(int ind);
 
         /**
-         * Function adds given finger print
+         * Function adds given finger print to given
+         * index
          */
         void add(uint32_t f, int ind);
 
@@ -46,7 +48,12 @@ class BucketsTable{
          */
         bool check_and_remove(uint32_t f, int ind);
 
+        /**
+         * Function returns true if the given index has
+         * the element f in it.
+         */
         bool check_val(uint32_t f, int ind) const;
+        
         /**
          * Yes I know this is kind of hacky but this will
          * be a bucket.  Set the bit field to be the
