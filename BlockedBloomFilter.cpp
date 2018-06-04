@@ -43,7 +43,7 @@ size_t BlockedBloomFilter::get_filter_index_for(int data) const {
 int BlockedBloomFilter::insert(int data) {
   // Arbitrary "fullness" threshold, done just for the testing infrastructure.
   // Bloom filters don't really reach fullness.
-  if (num_inserted_ >= total_size_in_bits_ * hash_funcs_.size()) return -1;
+  if (num_inserted_ >= total_size_in_bits_ / hash_funcs_.size() * 2) return -1;
 
   const size_t filter_index = get_filter_index_for(data);
   for (auto const& hash : hash_funcs_) {

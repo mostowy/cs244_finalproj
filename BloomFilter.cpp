@@ -44,7 +44,7 @@ BloomFilter::~BloomFilter() {
 int BloomFilter::insert(int data) {
   // Arbitrary "fullness" threshold, done just for the testing infrastructure.
   // Bloom filters don't really reach fullness.
-  if (num_inserted_ >= bit_vector_.size() * hash_funcs_.size()) return -1;
+  if (num_inserted_ >= bit_vector_.size() / hash_funcs_.size() * 2) return -1;
 
   for (auto const& hash : hash_funcs_) {
     const size_t bit_index = hash(data) % bit_vector_.size();
