@@ -26,9 +26,10 @@ class BlockedBloomFilter {
     unsigned char filter[CACHE_LINE_BYTES];
   };
   struct cache_line* bloom_filter_array_;
+  uint16_t* bits_flipped_;
   size_t num_bloom_filters_;
   size_t bits_per_bloom_filter_;
-  size_t total_size_in_bits_;
+  //size_t total_size_in_bits_;
   HashFunction hash_func_;
   uint8_t num_simulated_hash_funcs_;
   size_t num_inserted_;

@@ -7,7 +7,7 @@ BlockedBloomFilter::BlockedBloomFilter(size_t num_bloom_filters,
                                        uint8_t num_hash_funcs)
     : num_bloom_filters_(num_bloom_filters),
       bits_per_bloom_filter_(CACHE_LINE_BYTES * 8),
-      total_size_in_bits_(bits_per_bloom_filter_ * num_bloom_filters_),
+      //total_size_in_bits_(bits_per_bloom_filter_ * num_bloom_filters_),
       hash_func_(family->get()),
       num_simulated_hash_funcs_(num_hash_funcs),
       num_inserted_(0) {
@@ -20,10 +20,12 @@ BlockedBloomFilter::BlockedBloomFilter(size_t num_bloom_filters,
   posix_memalign((void **)&bloom_filter_array_, CACHE_LINE_BYTES,
       total_size_bytes);
   memset(bloom_filter_array_, 0, total_size_bytes);
+  bits_flipped_ = (uint16_t*) calloc(sizeof(uint16_t), num_bloom_filters_);
 }
 
 BlockedBloomFilter::~BlockedBloomFilter() {
   free(bloom_filter_array_);
+  free(bits_flipped_);
 }
 
 bool BlockedBloomFilter::get(size_t bloom_filter_index, size_t bit_index)
@@ -69,17 +71,27 @@ size_t BlockedBloomFilter::hash_data_and_get_filter_index(
 }
 
 int BlockedBloomFilter::insert(int data) {
-  // Arbitrary "fullness" threshold, done just for the testing infrastructure.
-  // Bloom filters don't really reach fullness.
-  if (num_inserted_ >= total_size_in_bits_ / num_simulated_hash_funcs_ * 2) {
-    return -1;
-  }
 
   uint32_t hashes[num_simulated_hash_funcs_];
   const size_t filter_index = hash_data_and_get_filter_index(data, &hashes[0]);
+
+  // Arbitrary "fullness" threshold, done just for the testing infrastructure.
+  // Bloom filters don't really reach fullness.
+  //if (num_inserted_ >= total_size_in_bits_ / num_simulated_hash_funcs_ * 2) {
+  //  return -1;
+ // }
+  float frac_bits_flipped = bits_flipped_[filter_index];
+  frac_bits_flipped /= (CACHE_LINE_BYTES * 8 * 1.0);
+  if (frac_bits_flipped >= 0.9) {
+    return -1;
+  }
+
   for (uint8_t i = 0; i < num_simulated_hash_funcs_; i++) {
     const size_t bit_index = hashes[i] % bits_per_bloom_filter_;
-    set(filter_index, bit_index, true);
+    if (!get(filter_index, bit_index)) {
+      set(filter_index, bit_index, true);
+      bits_flipped_[filter_index]++;
+    }
   }
   num_inserted_++;
   return 1;
