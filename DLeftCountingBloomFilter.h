@@ -10,9 +10,10 @@
 // Allowed range: 1 to 255. The dlcbf paper used 8; the cuckoo paper used 4.
 #define BUCKET_HEIGHT 4
 // Allowed range: 1 to 16 bits. The dlcbf paper used 14; the cuckoo paper
-// does not specify.
-// This sets what bits of the hash count as the remainder (stored in the table).
-#define REMAINDER_MASK 0xffffffff
+// does not specify. (The Cuckoo paper used 12 bits for the Cuckoo filter
+// fingerprints.)
+// This determines what bits of the hash comprise the "remainder".
+#define REMAINDER_MASK 0x00ffffff
 
 class DLeftCountingBloomFilter {
  public:
