@@ -73,6 +73,7 @@ void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
   insertTimer.stop();
   auto time = (float)insertTimer.elapsed() / 1000000000.0;
   std::cout<<"Inserting done after "<<i<<" elems in "<<time<<" seconds "<<std::endl;
+  std::cout<<"This gives "<< ((double)(i) / time) << " ops/sec"<<std::endl;
   // do info stuf
   time_lookup(filter_type, family, table);
 }
