@@ -78,10 +78,12 @@ int main() {
   std::cout << "Correctness Tests" << std::endl;
   std::cout<<"Cuckoo Filter Tests"<<std::endl;
   std::cout<<"----------------------------"<<std::endl;
-  time_inserting<CuckooFilter>(3000, *std::begin(allHashFamilies));
+  //time_inserting<CuckooFilter>(0, *std::begin(allHashFamilies));
+  //time_inserting<SSCuckooFilter>(0, *std::begin(allHashFamilies));
+  //time_inserting<QuotientFilter>(1, *std::begin(allHashFamilies));
   //std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
-  //std::cout << "  Cuckoo:         " << (time_inserting<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
-  //std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
+  std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
+  std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   //std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   //std::cout << "  Blocked Bloom:  " << (checkCorrectness<BlockedBloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << std::endl;
