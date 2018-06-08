@@ -6,6 +6,9 @@ DLeftCountingBloomFilter::DLeftCountingBloomFilter(size_t unused_size_in_bits,
     : hash_func_(family->get()) {
   subtables_ = (struct subtable*) calloc(sizeof(struct subtable),
                                          NUM_SUBTABLES);
+  for (int i = 0; i < NUM_SUBTABLES; i++) {
+    permutations_.push_back(family->get());
+  }
 }
 
 DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
@@ -18,7 +21,8 @@ uint16_t DLeftCountingBloomFilter::get_targets(
     int data, uint16_t targets[NUM_SUBTABLES]) const {
   uint32_t true_fingerprint = hash_func_(data);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
-    targets[i] = (true_fingerprint * (2*i+1)) % NUM_BUCKETS_PER_SUBTABLE;
+    //targets[i] = (true_fingerprint * (2*i+1)) % NUM_BUCKETS_PER_SUBTABLE;
+    targets[i] = permutations_[i](true_fingerprint) % NUM_BUCKETS_PER_SUBTABLE;
   }
   uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint
