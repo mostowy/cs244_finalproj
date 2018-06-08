@@ -39,7 +39,7 @@ void init_keys() {
   /* Distribution on which to apply the generator */
   std::uniform_int_distribution<long long unsigned> distribution(0,0xFFFFFFFFFFFFFFFF);
 
-  for (int i = 0; i < num_keys; i++) {
+  for (size_t i = 0; i < num_keys; i++) {
       keys[i] = distribution(generator);
   }
   std::cout<<"Randomly generated "<<num_keys<<" keys."<<std::endl;  
@@ -71,7 +71,7 @@ void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
     i++;
   }
   insertTimer.stop();
-  auto time = insertTimer.elapsed() * 1000000;
+  auto time = (float)insertTimer.elapsed() / 1000000000.0;
   std::cout<<"Inserting done after "<<i<<" elems in "<<time<<" seconds "<<std::endl;
   // do info stuf
   time_lookup(filter_type, family, table);
@@ -82,7 +82,7 @@ void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
  * By default it is cuckoo, set 1 for Quotient Filter, set 2 for bloom.
  */
 template <typename HT>
-void time_lookup(int filter_type, std::shared_ptr<HashFamily> family, HT table){
+void time_lookup(int filter_type, std::shared_ptr<HashFamily> family, HT& table){
     std::cout<<"Getting lookup performance"<<std::endl;
     float pos_frac = .5;
     size_t max_queries = 10000000;

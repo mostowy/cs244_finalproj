@@ -40,7 +40,7 @@ int CuckooFilter::run_cuckoo_loop(uint32_t f, int ind1, int ind2) {
   int counter = rand() % 2;
   int ind = (counter % 2 == 0) ? ind2 : ind1;
   //std::cout<<"ENTERING CUCKOO LOOP"<<std::endl;
-  for(size_t i = 0; i < num_max_cuckoos; i++) {
+  for(int i = 0; i < num_max_cuckoos; i++) {
     //std::cout<<"CC Loop Iter num: "<<i<<std::endl;
     if(!buckets.full(ind)){
         buckets.add(f, ind);

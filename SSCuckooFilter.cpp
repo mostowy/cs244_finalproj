@@ -39,7 +39,7 @@ int SSCuckooFilter::run_cuckoo_loop(uint32_t f, int ind1, int ind2) {
   int ind = (counter % 2 == 0) ? ind2 : ind1;
   uint32_t placeholder = 0;
 
-  for(size_t i = 0; i < num_max_cuckoos; i++) {
+  for(int i = 0; i < num_max_cuckoos; i++) {
     if(buckets.add(f, ind, placeholder)){
         return 1; 
     }
