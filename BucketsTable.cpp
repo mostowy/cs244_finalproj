@@ -4,17 +4,12 @@
 #include <set>
 #include <vector>
 #include <iostream>
-//struct entry{
-//    int f;
-//    int empty;
-//}; 
 
 BucketsTable::BucketsTable(size_t numBuckets){
     num_buckets = numBuckets;
     num_elems = 0;
     buckets = new struct buck_struct[num_buckets];
-    f_size = 32;
-    full_val = 15; // corresponds to 1111 for b = 4
+    f_size = 12;
     // Set to all zeros
     for(int i = 0; i < num_buckets; i++){
         buckets[i].e1 = 0;

@@ -60,18 +60,16 @@ class BucketsTable{
          * finger print size.
          */
         struct buck_struct{
-            unsigned e1:32;
-            unsigned e2:32;
-            unsigned e3:32;
-            unsigned e4:32;
-            unsigned full:4;
+            unsigned e1:12;
+            unsigned e2:12;
+            unsigned e3:12;
+            unsigned e4:12;
         };
 
     private:
         size_t num_elems;
         size_t num_buckets;
         int f_size;
-        int full_val;
         struct buck_struct* buckets;
         //BucketsTable(BucketsTable const &) = delete;
         void operator=(BucketsTable const &) = delete;
