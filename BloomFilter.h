@@ -2,7 +2,6 @@
 #define BloomFilter_Included
 
 #include "Hashes.h"
-#include <vector>
 
 class BitVector {
  public:
@@ -23,14 +22,16 @@ class BitVector {
 class BloomFilter {
  public:
   BloomFilter(size_t size_in_bits, std::shared_ptr<HashFamily> family,
-              int num_hash_funcs = 8);
+              uint8_t num_hash_funcs = 8);
   ~BloomFilter();
   int insert(int data);
   bool contains(int data) const;
 
  private:
+  void hash_data(int data, uint32_t* hashes) const;
   BitVector bit_vector_;
-  std::vector<HashFunction> hash_funcs_;
+  HashFunction hash_func_;
+  uint8_t num_simulated_hash_funcs_;
   // This is an artificial way of saying that the bloom filter is "full" for
   // the purposes of the testing infrastructure.
   size_t num_inserted_;
