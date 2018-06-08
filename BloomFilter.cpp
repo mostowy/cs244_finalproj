@@ -34,6 +34,7 @@ BloomFilter::BloomFilter(size_t size_in_bits, std::shared_ptr<HashFamily> family
     : bit_vector_(size_in_bits),
       hash_func_(family->get()),
       num_simulated_hash_funcs_(num_hash_funcs),
+      num_bits_flipped_(0),
       num_inserted_(0) {
   if (num_simulated_hash_funcs_ < 1) num_simulated_hash_funcs_ = 1;
 }
@@ -63,16 +64,25 @@ void BloomFilter::hash_data(int data, uint32_t* hashes) const {
 int BloomFilter::insert(int data) {
   // Arbitrary "fullness" threshold, done just for the testing infrastructure.
   // Bloom filters don't really reach fullness.
-  if (num_inserted_ >= bit_vector_.size() / num_simulated_hash_funcs_ * 2) {
+
+  float frac_bits_flipped = num_bits_flipped_;
+  frac_bits_flipped /= (bit_vector_.size() * 1.0);
+  if (frac_bits_flipped >= 0.9) {
     return -1;
   }
+  //if (num_inserted_ >= bit_vector_.size() / num_simulated_hash_funcs_ * 2) {
+  //  return -1;
+  //}
 
   uint32_t hashes[num_simulated_hash_funcs_];
   hash_data(data, &hashes[0]);
 
   for (uint8_t i = 0; i < num_simulated_hash_funcs_; i++) {
     const size_t bit_index = hashes[i] % bit_vector_.size();
-    bit_vector_.set(bit_index, true);
+    if (!bit_vector_.get(bit_index)) {
+      bit_vector_.set(bit_index, true);
+      num_bits_flipped_++;
+    }
   }
   num_inserted_++;
   return 1;

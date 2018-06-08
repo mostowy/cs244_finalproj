@@ -34,6 +34,7 @@ class BloomFilter {
   BitVector bit_vector_;
   HashFunction hash_func_;
   uint8_t num_simulated_hash_funcs_;
+  uint64_t num_bits_flipped_;
   // This is an artificial way of saying that the bloom filter is "full" for
   // the purposes of the testing infrastructure.
   size_t num_inserted_;
