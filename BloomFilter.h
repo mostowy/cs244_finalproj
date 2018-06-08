@@ -21,8 +21,10 @@ class BitVector {
 
 class BloomFilter {
  public:
+  // To get 192MB like the Cuckoo filter paper, pass in this number of bits:
+  //   192 * 1024 * 1024 * 8 = 1610612736
   BloomFilter(size_t size_in_bits, std::shared_ptr<HashFamily> family,
-              uint8_t num_hash_funcs = 8);
+              uint8_t num_hash_funcs = 9);
   ~BloomFilter();
   int insert(int data);
   bool contains(int data) const;
