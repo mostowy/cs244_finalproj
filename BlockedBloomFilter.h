@@ -12,7 +12,7 @@ class BlockedBloomFilter {
  public:
   BlockedBloomFilter(size_t unused_size_in_bits,
                      std::shared_ptr<HashFamily> family,
-                     int num_hash_funcs = 8);
+                     uint8_t num_hash_funcs = 8);
   ~BlockedBloomFilter();
   int insert(int data);
   bool contains(int data) const;
@@ -20,12 +20,13 @@ class BlockedBloomFilter {
  private:
   bool get(size_t bloom_filter_index, size_t bit_index) const;
   void set(size_t bloom_filter_index, size_t bit_index, bool value);
-  size_t get_filter_index_for(int data) const;
+  size_t hash_data_and_get_filter_index(int data, uint32_t* hashes) const;
   alignas(CACHE_LINE_BYTES) unsigned char
       bloom_filter_array_[NUM_BLOOM_FILTERS][CACHE_LINE_BYTES];
   size_t bits_per_bloom_filter_;
   size_t total_size_in_bits_;
-  std::vector<HashFunction> hash_funcs_;
+  HashFunction hash_func_;
+  uint8_t num_simulated_hash_funcs_;
   size_t num_inserted_;
   // Disable copy construction.
   BlockedBloomFilter(BlockedBloomFilter const &) = delete;
