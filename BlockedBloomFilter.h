@@ -26,7 +26,7 @@ class BlockedBloomFilter {
   size_t bits_per_bloom_filter_;
   size_t total_size_in_bits_;
   std::vector<HashFunction> hash_funcs_;
-  int num_inserted_;
+  size_t num_inserted_;
   // Disable copy construction.
   BlockedBloomFilter(BlockedBloomFilter const &) = delete;
   void operator=(BlockedBloomFilter const &) = delete;

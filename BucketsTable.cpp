@@ -11,7 +11,7 @@ BucketsTable::BucketsTable(size_t numBuckets){
     buckets = new struct buck_struct[num_buckets];
     f_size = 12;
     // Set to all zeros
-    for(int i = 0; i < num_buckets; i++){
+    for(size_t i = 0; i < num_buckets; i++){
         buckets[i].e1 = 0;
         buckets[i].e2 = 0;
         buckets[i].e3 = 0;

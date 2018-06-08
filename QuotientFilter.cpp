@@ -14,7 +14,7 @@ QuotientFilter::QuotientFilter(size_t numBuckets,
   stat_arr = stat_temp;
   num_elems = 0;
   buckets = new b_struct[numBuckets];
-  for(int i = 0; i < numBuckets; i++){
+  for(size_t i = 0; i < numBuckets; i++){
     buckets[i].r = 0;
   }
 }
