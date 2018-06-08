@@ -4,6 +4,7 @@
 #include "BlockedBloomFilter.h"
 #include "BloomFilter.h"
 #include "CuckooFilter.h"
+#include "DLeftCountingBloomFilter.h"
 #include "SSCuckooFilter.h"
 #include "Timing.h"
 #include "QuotientFilter.h"
@@ -38,7 +39,8 @@ int main() {
   std::cout << "Using hash family: " << (*allHashFamilies.begin())->name()
             << std::endl;
 
-/*  std::cout << "Sanity Checks" << std::endl;
+  /*
+  std::cout << "Sanity Checks" << std::endl;
 
   std::cout << "  Hash functions are different:     ";
   {
@@ -72,7 +74,33 @@ int main() {
       std::cout << "fail";
     }
     std::cout << std::endl;
-  }*/
+  }
+
+  std::cout << "  d-Left CBF basic functionality: ";
+  {
+    DLeftCountingBloomFilter dlcbf(1200, cityHash64());
+    dlcbf.insert(5);
+    dlcbf.insert(2400);
+    for (int i = 0; i < 10; i++) {
+      dlcbf.insert(i);
+    }
+    bool success =
+        !dlcbf.contains(10) &&
+        dlcbf.contains(5) &&
+        dlcbf.contains(2400);
+    for (int i = 0; i < 10; i++) {
+      if (!dlcbf.contains(i)) {
+        success = false;
+      }
+    }
+    if (success) {
+      std::cout << "Pass";
+    } else {
+      std::cout << "fail";
+    }
+    std::cout << std::endl;
+  }
+  */
 
   std::cout << std::endl;
   std::cout << "Correctness Tests" << std::endl;
@@ -86,6 +114,7 @@ int main() {
   std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   //std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   //std::cout << "  Blocked Bloom:  " << (checkCorrectness<BlockedBloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  //std::cout << "  d-Left CBF:  " << (checkCorrectness<DLeftCountingBloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   std::cout << std::endl;
 
   /* Test linear probing variants. */
