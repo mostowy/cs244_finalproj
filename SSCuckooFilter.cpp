@@ -7,24 +7,31 @@
 #include <iostream>
 
 SSCuckooFilter::SSCuckooFilter(size_t arr_size, std::shared_ptr<HashFamily> family) 
-:buckets(arr_size, 32){
-  //size_t entries_per_bucket = 4; 
-  // First set variables  
+:buckets(arr_size, 12){
   numBucks = arr_size;
   h1 = family->get();
   finger_pointer = family->get();
   num_max_cuckoos = 500;
   num_elems = 0;
-  // Now set b1 and b2
-  // TODO SET FINGER SIZE
-  //buckets = SemiSortTable(numBucks, 32);
+  f_bit_size = 12;
+  f_mask = (1ULL << f_bit_size) - 1;  
 }
 
 SSCuckooFilter::~SSCuckooFilter() {
-  //for(size_t i = 0; i < b1.size(); i++){
-  //  delete b1[i];
-  //  delete b2[i];
-  //}
+}
+
+uint32_t SSCuckooFilter::get_finger_print(uint64_t data) const{
+    // Problem here is that hash is 64 but we want
+    // a specific finger print size.  For us, that
+    // size is 12 for the experiment
+    uint64_t large_finger = finger_pointer(data);
+    
+    // Get 32 most significant bits, mask off f
+    uint32_t f = (large_finger >> 32) & f_mask;
+    
+    // Make sure finger print is not zero
+    f += (f == 0);
+    return f;
 }
 
 int SSCuckooFilter::run_cuckoo_loop(uint32_t f, int ind1, int ind2) {
@@ -42,8 +49,8 @@ int SSCuckooFilter::run_cuckoo_loop(uint32_t f, int ind1, int ind2) {
   return -1;
 }
 
-int SSCuckooFilter::insert(int data) {
-  uint32_t f = finger_pointer(data);
+int SSCuckooFilter::insert(uint64_t data) {
+  uint32_t f = get_finger_print(data);
   int ind1 = h1(data) % numBucks;
   int ind2 = (ind1 ^ h1(f)) % numBucks;
   uint32_t placeholder = 0;
@@ -66,15 +73,15 @@ int SSCuckooFilter::insert(int data) {
   return run_cuckoo_loop(f, ind1, ind2);
 }
 
-bool SSCuckooFilter::contains(int data) const {
-  int f = finger_pointer(data);
+bool SSCuckooFilter::contains(uint64_t data) const {
+  uint32_t f =  get_finger_print(data);
   int ind1 = h1(data) % numBucks;
   int ind2 = (ind1 ^ h1(f)) % numBucks;
   return buckets.has(f, ind1, ind2);
 }
 
-void SSCuckooFilter::remove(int data) {
-  int f = finger_pointer(data);
+void SSCuckooFilter::remove(uint64_t data) {
+  uint32_t f =  get_finger_print(data);
   int ind1 = h1(f);
   int ind2 = ind1 ^ f;
   if(buckets.check_and_remove(f, ind1))

@@ -78,10 +78,10 @@ class SemiSortTable{
 
         struct buck_struct{
             unsigned index:12;
-            unsigned e1:28;
-            unsigned e2:28;
-            unsigned e3:28;
-            unsigned e4:28;
+            unsigned e1:8;
+            unsigned e2:8;
+            unsigned e3:8;
+            unsigned e4:8;
         };
 
     private:
