@@ -33,7 +33,7 @@ class BloomFilter {
   std::vector<HashFunction> hash_funcs_;
   // This is an artificial way of saying that the bloom filter is "full" for
   // the purposes of the testing infrastructure.
-  int num_inserted_;
+  size_t num_inserted_;
   // Disable copy construction.
   BloomFilter(BloomFilter const &) = delete;
   void operator=(BloomFilter const &) = delete;

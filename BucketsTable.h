@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <vector>
+#include <stdint.h>
 
 class BucketsTable{
     public:
