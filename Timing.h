@@ -75,7 +75,7 @@ void time_inserting(size_t bucket_size, std::shared_ptr<HashFamily> family) {
   std::cout<<"Inserting done after "<<i<<" elems in "<<time<<" seconds "<<std::endl;
   std::cout<<"This gives "<< ((double)(i) / time) << " ops/sec"<<std::endl;
   // do info stuf
-  time_lookup(filter_type, family, table);
+  time_lookup(family, table);
 }
 
 /**
@@ -83,7 +83,7 @@ void time_inserting(size_t bucket_size, std::shared_ptr<HashFamily> family) {
  * By default it is cuckoo, set 1 for Quotient Filter, set 2 for bloom.
  */
 template <typename HT>
-void time_lookup(int filter_type, std::shared_ptr<HashFamily> family, HT& table){
+void time_lookup(std::shared_ptr<HashFamily> family, HT& table){
     std::cout<<"----------------------Getting lookup performance----------------------"<<std::endl;
     float pos_frac = .5;
     size_t max_queries = 10000000;
