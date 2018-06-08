@@ -1,12 +1,16 @@
 #include "DLeftCountingBloomFilter.h"
 //#include <iostream>
 
+// Arbitrary prime number, used as a linear permutation function.
+#define PRIME1 9199
+#define PRIME2 2221
+
 DLeftCountingBloomFilter::DLeftCountingBloomFilter(
     uint16_t buckets_per_subtable, std::shared_ptr<HashFamily> family)
     : num_buckets_per_subtable_(buckets_per_subtable),
       hash_func_(family->get()) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
-    permutations_.push_back(family->get());
+    //permutations_.push_back(family->get());
     subtables_[i].buckets = (struct dlcbf_bucket*)
         calloc(sizeof(struct dlcbf_bucket), num_buckets_per_subtable_);
   }
@@ -22,10 +26,14 @@ DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
 // dlcbf paper calls the "remainder").
 uint16_t DLeftCountingBloomFilter::get_targets(
     int data, uint16_t targets[NUM_SUBTABLES]) const {
-  uint32_t true_fingerprint = hash_func_(data);
+  uint64_t true_fingerprint = hash_func_(data);
+  uint16_t hidden_fingerprint = true_fingerprint & REMAINDER_MASK;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
-    targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
+    targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
+        % num_buckets_per_subtable_;
+    // This is actually supposed to be a permutation function...
+    //targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
   }
   uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint

@@ -12,7 +12,7 @@
 // Allowed range: 1 to 16 bits. The dlcbf paper used 14; the cuckoo paper
 // does not specify.
 // This sets what bits of the hash count as the remainder (stored in the table).
-#define REMAINDER_MASK 0x5fffffff
+#define REMAINDER_MASK 0xffffffff
 
 class DLeftCountingBloomFilter {
  public:
@@ -35,7 +35,8 @@ class DLeftCountingBloomFilter {
   struct subtable subtables_[NUM_SUBTABLES];
   uint16_t num_buckets_per_subtable_;
   HashFunction hash_func_;
-  std::vector<HashFunction> permutations_;
+  // Hash functions aren't actually valid permutation functions.
+  //std::vector<HashFunction> permutations_;
   // Disable copy construction.
   DLeftCountingBloomFilter(DLeftCountingBloomFilter const &) = delete;
   void operator=(DLeftCountingBloomFilter const &) = delete;
