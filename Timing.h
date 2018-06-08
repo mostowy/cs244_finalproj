@@ -66,8 +66,6 @@ void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
   Timer insertTimer;
   insertTimer.start();
   while((i < num_keys)) {
-    if((i%100000) == 0)
-        std::cout<<"Element "<<i<<std::endl;
     if(table.insert(keys[i]) == -1)
         break;
     i++;
