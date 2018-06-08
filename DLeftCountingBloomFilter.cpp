@@ -1,18 +1,21 @@
 #include "DLeftCountingBloomFilter.h"
 //#include <iostream>
 
-DLeftCountingBloomFilter::DLeftCountingBloomFilter(size_t unused_size_in_bits,
-                           std::shared_ptr<HashFamily> family)
-    : hash_func_(family->get()) {
-  subtables_ = (struct subtable*) calloc(sizeof(struct subtable),
-                                         NUM_SUBTABLES);
+DLeftCountingBloomFilter::DLeftCountingBloomFilter(
+    uint16_t buckets_per_subtable, std::shared_ptr<HashFamily> family)
+    : num_buckets_per_subtable_(buckets_per_subtable),
+      hash_func_(family->get()) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     permutations_.push_back(family->get());
+    subtables_[i].buckets = (struct dlcbf_bucket*)
+        calloc(sizeof(struct dlcbf_bucket), num_buckets_per_subtable_);
   }
 }
 
 DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
-  free(subtables_);
+  for (int i = 0; i < NUM_SUBTABLES; i++) {
+    free(subtables_[i].buckets);
+  }
 }
 
 // Populates `targets` (bucket indexes) and returns the fingerprint (what the
@@ -21,8 +24,8 @@ uint16_t DLeftCountingBloomFilter::get_targets(
     int data, uint16_t targets[NUM_SUBTABLES]) const {
   uint32_t true_fingerprint = hash_func_(data);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
-    //targets[i] = (true_fingerprint * (2*i+1)) % NUM_BUCKETS_PER_SUBTABLE;
-    targets[i] = permutations_[i](true_fingerprint) % NUM_BUCKETS_PER_SUBTABLE;
+    //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
+    targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
   }
   uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint

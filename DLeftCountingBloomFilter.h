@@ -7,8 +7,6 @@
 
 // Allowed range: 1 to 255. The dlcbf paper used 4.
 #define NUM_SUBTABLES 4
-// Allowed range: 1 to 65535. The dlcbf paper used 2048.
-#define NUM_BUCKETS_PER_SUBTABLE 2048
 // Allowed range: 1 to 255. The dlcbf paper used 8.
 #define BUCKET_HEIGHT 8
 // Allowed range: 1 to 16 bits. The dlcbf paper used 14.
@@ -17,7 +15,7 @@
 
 class DLeftCountingBloomFilter {
  public:
-  DLeftCountingBloomFilter(size_t unused_size_in_bits,
+  DLeftCountingBloomFilter(uint16_t buckets_per_subtable,
                            std::shared_ptr<HashFamily> family);
   ~DLeftCountingBloomFilter();
   int insert(int data);
@@ -26,13 +24,15 @@ class DLeftCountingBloomFilter {
 
  private:
   uint16_t get_targets(int data, uint16_t targets[NUM_SUBTABLES]) const;
-  struct subtable {
-    struct bucket {
-      uint8_t fill_count;
-      uint16_t fingerprints[BUCKET_HEIGHT];
-    } buckets[NUM_BUCKETS_PER_SUBTABLE];
+  struct dlcbf_bucket {
+    uint8_t fill_count;
+    uint16_t fingerprints[BUCKET_HEIGHT];
   };
-  struct subtable* subtables_;
+  struct subtable {
+    struct dlcbf_bucket* buckets;
+  };
+  struct subtable subtables_[NUM_SUBTABLES];
+  uint16_t num_buckets_per_subtable_;
   HashFunction hash_func_;
   std::vector<HashFunction> permutations_;
   // Disable copy construction.
