@@ -118,7 +118,10 @@ int main() {
   time_inserting<BloomFilter>(1610612736, *std::begin(allHashFamilies));
   std::cout<<"###################  dlcbf Filter Test  ##################"<<std::endl;
   std::cout<<"##########################################################"<<std::endl;
-  time_inserting<DLeftCountingBloomFilter>(1610612736, *std::begin(allHashFamilies));
+  time_inserting<DLeftCountingBloomFilter>(1797558, *std::begin(allHashFamilies));
+  std::cout<<"###############  Blocked Bloom Filter Test  ##############"<<std::endl;
+  std::cout<<"##########################################################"<<std::endl;
+  time_inserting<BlockedBloomFilter>(3145728, *std::begin(allHashFamilies));
   //std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   //std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   //std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
