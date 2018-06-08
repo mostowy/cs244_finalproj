@@ -19,7 +19,7 @@ SemiSortTable::SemiSortTable(size_t numBuckets, size_t f_size): perm() {
     len_bytes = bytes_per_bucket * numBuckets;
     buckets = new buck_struct[num_buckets];
     //entry_mask = pow(2, bits_per_entry) - 1; 
-    for(int i = 0; i < num_buckets; i++) {
+    for(size_t i = 0; i < num_buckets; i++) {
         buckets[i].index = 0;
         buckets[i].e1 = 0;
         buckets[i].e2 = 0;
