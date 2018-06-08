@@ -20,7 +20,7 @@ public:
    * Function given a fingerprint returns either the q
    * or r value depending on the is_q value specified
    */
-  int getqr(uint64_t f, bool is_q) const;
+  uint64_t getqr(uint64_t f, bool is_q) const;
 
   /**
    * Inserts the specified element into filter. If the element already
@@ -32,7 +32,7 @@ public:
    * Function sets the three indicator bits for the given
    * index to the given value.
    */
-  void set_3_bit(size_t ind, bool occ, bool cont, bool shift);
+  void set_3_bit(uint64_t ind, bool occ, bool cont, bool shift);
   
   /**
    * Returns whether the specified key is contained in the filter.
@@ -55,31 +55,31 @@ public:
    * Function takes in a bucket index and
    * decrements it, accounting for wrap around.
    */
-  size_t decrement(size_t bucket) const;
+  uint64_t decrement(uint64_t bucket) const;
   
   
   /**
    * Funciton returns whether or not a given
    * index is filled (true) or empty (false)
    */
-  bool isFilled(size_t ind) const;
+  bool isFilled(uint64_t ind) const;
   
   /**
    * Function increments the given bucket according to the
    * wrap around rule.
    */
-  size_t increment(size_t numBucks, size_t bucket) const;
+  uint64_t increment(size_t numBucks, uint64_t bucket) const;
   
   /**
    * Function returns whether or not the given bucket
    * is the beginning of a cluster.
    */
-  bool isClusterStart(size_t bucket) const;
+  bool isClusterStart(uint64_t bucket) const;
   
   /**
    * Finds the run for the given bucket.
    */
-  size_t find_run(size_t bucket) const;
+  uint64_t find_run(uint64_t bucket) const;
 
   struct b_struct {
     unsigned r:9;

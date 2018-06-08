@@ -113,7 +113,7 @@ int main() {
   std::cout<<"#################  Quotient Filter Test  #################"<<std::endl;
   std::cout<<"##########################################################"<<std::endl;
   time_inserting<QuotientFilter>(1, *std::begin(allHashFamilies));
-  //std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
+  std::cout << "  Quotient:       " << (checkCorrectness<QuotientFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;
   //std::cout << "  Cuckoo:         " << (checkCorrectness<CuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   //std::cout << "  SemiSort Cuckoo:         " << (checkCorrectness<SSCuckooFilter>(allHashFamilies) ? "pass" : "fail") << std::endl;
   //std::cout << "  Bloom:          " << (checkCorrectness<BloomFilter>(allHashFamilies) ? "Pass" : "fail") << std::endl;

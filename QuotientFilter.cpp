@@ -23,9 +23,9 @@ QuotientFilter::~QuotientFilter() {
   // TODO implement this
 }
 
-int QuotientFilter::getqr(uint64_t f, bool is_q) const {
+uint64_t QuotientFilter::getqr(uint64_t f, bool is_q) const {
   uint64_t mask = 0xffffffffffffffff;
-  int ret = 0;
+  uint64_t ret = 0;
   if(is_q){
       mask = mask << r;
       ret = f & mask;
@@ -39,9 +39,9 @@ int QuotientFilter::getqr(uint64_t f, bool is_q) const {
 
 int QuotientFilter::insert(uint64_t data) {
   uint64_t f = fp(data);
-  int q_int = getqr(f, true);
-  uint16_t r_int = getqr(f, false);
-  size_t bucket = q_int % numBucks;
+  uint64_t q_int = getqr(f, true);
+  uint16_t r_int = (uint16_t)getqr(f, false);
+  uint64_t bucket = (q_int % numBucks);
   
   float load_factor = .9;
   // If full to load factor, cant insert.
@@ -124,11 +124,11 @@ int QuotientFilter::insert(uint64_t data) {
 
 bool QuotientFilter::contains(uint64_t data) const {
   uint64_t f = fp(data);
-  int q_int = getqr(f, true);
-  uint16_t r_int = getqr(f, false);
-  size_t bucket = q_int % numBucks;
-  size_t run_start = bucket;
-  size_t started = bucket;
+  uint64_t q_int = getqr(f, true);
+  uint16_t r_int = (uint16_t)getqr(f, false);
+  uint64_t bucket = (q_int % numBucks);
+  uint64_t run_start = bucket;
+  uint64_t started = bucket;
 
   // If connonical slot empty, return false
   if(stat_arr[bucket*3] == false)
@@ -159,7 +159,8 @@ bool QuotientFilter::contains(uint64_t data) const {
 
 bool QuotientFilter::linscan(uint64_t data, size_t bucket) const{
   uint64_t f = fp(data);
-  uint16_t r_int = getqr(f, false);
+  uint16_t r_int = (uint16_t)getqr(f, false);
+  //uint64_t bucket = (q_int % numBucks);
   size_t spot = bucket;
   do{
     if(buckets[spot].r == r_int)
@@ -190,18 +191,18 @@ void QuotientFilter::remove(uint64_t data) {
 
 
 // Below are helper functions for the main algorithms
-bool QuotientFilter::isFilled(size_t ind) const{
+bool QuotientFilter::isFilled(uint64_t ind) const{
   return stat_arr[ind*3] || stat_arr[(ind * 3) +1] || stat_arr[(ind*3) +2];
 }
 
 
-size_t QuotientFilter::decrement(size_t bucket) const{
+uint64_t QuotientFilter::decrement(uint64_t bucket) const{
   if(bucket == 0)
     return numBucks - 1;
   return bucket - 1;
 }
 
-void QuotientFilter::set_3_bit(size_t ind, bool occ,
+void QuotientFilter::set_3_bit(uint64_t ind, bool occ,
                         bool cont, bool shift) {
   stat_arr[ind * 3] = occ;
   stat_arr[(ind * 3) + 1] = cont;
@@ -209,23 +210,23 @@ void QuotientFilter::set_3_bit(size_t ind, bool occ,
 }
 
 
-size_t QuotientFilter::increment(size_t numBucks, size_t bucket) const {
+uint64_t QuotientFilter::increment(size_t numBucks, uint64_t bucket) const {
   if(bucket >= numBucks - 1)
     return 0;
   return bucket + 1;
 }
 
-bool QuotientFilter::isClusterStart(size_t bucket) const {
+bool QuotientFilter::isClusterStart(uint64_t bucket) const {
   return (stat_arr[bucket*3] == true && stat_arr[(bucket*3) + 1] == false
           && stat_arr[(bucket*3) + 2] == false);
 }
 
-size_t QuotientFilter::find_run(size_t bucket) const{
-  size_t temp_bucket = bucket;
+uint64_t QuotientFilter::find_run(uint64_t bucket) const{
+  uint64_t temp_bucket = bucket;
   while(stat_arr[(temp_bucket*3) + 2] == true) {
     temp_bucket = decrement(temp_bucket);
   }
-  size_t start = temp_bucket;
+  uint64_t start = temp_bucket;
   while(temp_bucket != bucket) {
     do {
         start = increment(numBucks, start);
