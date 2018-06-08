@@ -6,7 +6,7 @@
 #define PRIME2 2221
 
 DLeftCountingBloomFilter::DLeftCountingBloomFilter(
-    uint16_t buckets_per_subtable, std::shared_ptr<HashFamily> family)
+    uint32_t buckets_per_subtable, std::shared_ptr<HashFamily> family)
     : num_buckets_per_subtable_(buckets_per_subtable),
       hash_func_(family->get()) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
@@ -25,9 +25,9 @@ DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
 // Populates `targets` (bucket indexes) and returns the fingerprint (what the
 // dlcbf paper calls the "remainder").
 uint16_t DLeftCountingBloomFilter::get_targets(
-    int data, uint16_t targets[NUM_SUBTABLES]) const {
+    int data, uint32_t targets[NUM_SUBTABLES]) const {
   uint64_t true_fingerprint = hash_func_(data);
-  uint16_t hidden_fingerprint = true_fingerprint & REMAINDER_MASK;
+  uint16_t hidden_fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
     targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
@@ -46,7 +46,7 @@ uint16_t DLeftCountingBloomFilter::get_targets(
 }
 
 int DLeftCountingBloomFilter::insert(int data) {
-  uint16_t targets[NUM_SUBTABLES];
+  uint32_t targets[NUM_SUBTABLES];
   uint16_t fingerprint = get_targets(data, &targets[0]);
   uint8_t min_fill_count = BUCKET_HEIGHT;
   uint8_t best_subtable = 0;
@@ -77,7 +77,7 @@ int DLeftCountingBloomFilter::insert(int data) {
 }
 
 bool DLeftCountingBloomFilter::contains(int data) const {
-  uint16_t targets[NUM_SUBTABLES];
+  uint32_t targets[NUM_SUBTABLES];
   uint16_t fingerprint = get_targets(data, &targets[0]);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
@@ -94,7 +94,7 @@ bool DLeftCountingBloomFilter::contains(int data) const {
 }
 
 void DLeftCountingBloomFilter::remove(int data) {
-  uint16_t targets[NUM_SUBTABLES];
+  uint32_t targets[NUM_SUBTABLES];
   uint16_t fingerprint = get_targets(data, &targets[0]);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];

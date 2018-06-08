@@ -13,11 +13,28 @@
 // does not specify. (The Cuckoo paper used 12 bits for the Cuckoo filter
 // fingerprints.)
 // This determines what bits of the hash comprise the "remainder".
-#define REMAINDER_MASK 0x00ffffff
+#define REMAINDER_MASK 0x0fff
+
+/*
+  12 bits per fp
+  4 fp + 8 bits per bucket
+  BUCK buckets per subtable
+  4 tables per dlcbf
+
+  1 dlcbf = 1 dlcbf * 4 t/dlcbf * BUCK b/t * (48+8) bits/b = 192MB
+  224*BUCK bits = 192MB
+  28*BUCK bytes = 192MB
+  BUCK = 192 * 1024 * 1024 / 28
+  BUCK ~= 7190235
+  So buckets per subtable = BUCK/4 ~= 1797558
+*/
 
 class DLeftCountingBloomFilter {
  public:
-  DLeftCountingBloomFilter(uint16_t buckets_per_subtable,
+  // To get 192MB like the Cuckoo filter paper, pass in this value:
+  //   1797558
+  // (See above for the calculation)
+  DLeftCountingBloomFilter(uint32_t buckets_per_subtable,
                            std::shared_ptr<HashFamily> family);
   ~DLeftCountingBloomFilter();
   int insert(int data);
@@ -25,7 +42,7 @@ class DLeftCountingBloomFilter {
   void remove(int data);
 
  private:
-  uint16_t get_targets(int data, uint16_t targets[NUM_SUBTABLES]) const;
+  uint16_t get_targets(int data, uint32_t targets[NUM_SUBTABLES]) const;
   struct dlcbf_bucket {
     uint8_t fill_count;
     uint16_t fingerprints[BUCKET_HEIGHT];
