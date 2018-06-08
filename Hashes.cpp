@@ -159,9 +159,9 @@ std::shared_ptr<HashFamily> cityHash64() {
     virtual HashFunction get() const {
       const uint64 seed = nextCityHashSeed++;
       return [seed] (int key) {
-        const char* buf = (const char*) &key;
-        const uint64 result = CityHash64WithSeed(buf, sizeof(key), seed);
-        return (size_t) result;
+        const uint64_t result =
+            CityHash64WithSeed((const char*) &key, sizeof(key), seed);
+        return result;
       };
     }
 

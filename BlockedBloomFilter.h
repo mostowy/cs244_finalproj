@@ -5,7 +5,8 @@
 #include "Hashes.h"
 
 #define NUM_BLOOM_FILTERS 8
-#define CACHE_LINE_BYTES 128
+// The cuckoo paper had 64 bytes as the size of a cache line in their testbed.
+#define CACHE_LINE_BYTES 64
 
 class BlockedBloomFilter {
  public:

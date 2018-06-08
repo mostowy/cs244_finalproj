@@ -5,11 +5,12 @@
 #include <vector>
 #include "Hashes.h"
 
-// Allowed range: 1 to 255. The dlcbf paper used 4.
+// Allowed range: 1 to 255. The dlcbf paper used 4; the cuckoo paper used 4.
 #define NUM_SUBTABLES 4
-// Allowed range: 1 to 255. The dlcbf paper used 8.
-#define BUCKET_HEIGHT 8
-// Allowed range: 1 to 16 bits. The dlcbf paper used 14.
+// Allowed range: 1 to 255. The dlcbf paper used 8; the cuckoo paper used 4.
+#define BUCKET_HEIGHT 4
+// Allowed range: 1 to 16 bits. The dlcbf paper used 14; the cuckoo paper
+// does not specify.
 // This sets what bits of the hash count as the remainder (stored in the table).
 #define REMAINDER_MASK 0x5fffffff
 

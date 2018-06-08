@@ -11,7 +11,7 @@
  * uses the C++ std::function type, which is essentially a smarter version of
  * a function pointer.
  */
-using HashFunction = std::function<size_t(int)>;
+using HashFunction = std::function<uint64_t(int)>;
 
 /* Interface: HashFamily
  * ----------------------------------------------------------------------------
