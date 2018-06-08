@@ -52,7 +52,7 @@ void init_keys() {
  */
 template <typename HT>
 void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
-  std::cout<<"Getting insert performance"<<std::endl;
+  std::cout<<"----------------Getting insert performance----------------------"<<std::endl;
   init_keys();
   size_t bucket_size = num_rows;
   switch(filter_type) {
@@ -73,6 +73,7 @@ void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
   insertTimer.stop();
   auto time = (float)insertTimer.elapsed() / 1000000000.0;
   std::cout<<"Inserting done after "<<i<<" elems in "<<time<<" seconds "<<std::endl;
+  std::cout<<"This gives "<< ((double)(i) / time) << " ops/sec"<<std::endl;
   // do info stuf
   time_lookup(filter_type, family, table);
 }
@@ -83,13 +84,14 @@ void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
  */
 template <typename HT>
 void time_lookup(int filter_type, std::shared_ptr<HashFamily> family, HT& table){
-    std::cout<<"Getting lookup performance"<<std::endl;
+    std::cout<<"----------------------Getting lookup performance----------------------"<<std::endl;
     float pos_frac = .5;
     size_t max_queries = 10000000;
     auto queries = new uint64_t[max_queries];
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_int_distribution<long long unsigned> distribution(0,0xFFFFFFFFFFFFFFFF);
+    std::unordered_set<uint64_t> reference;
     for (size_t i = 0; i < max_queries; i++) {
         float  r = (double) rand() / RAND_MAX;
         if (r  > pos_frac) {
@@ -100,31 +102,45 @@ void time_lookup(int filter_type, std::shared_ptr<HashFamily> family, HT& table)
             queries[i] = keys[j];
         }
     }
+    std::cout<<"Buliding Reference"<<std::endl;
+    for(size_t i = 0; i < num_keys; i++) {
+        reference.insert(keys[i]);
+    }
 
     size_t false_ops  = 0;
+    size_t true_ops = 0;
     size_t total_ops = 0;
     double total_time = 0;
+    std::cout<<"Running timing Loop"<<std::endl;
     while (total_time < 10) 
     {
 
         Timer querytimer;
-        querytimer.start();
         for (size_t j = 0; j < max_queries; j++) {
-            int res = (table.contains(queries[j]) == true);
-            false_ops += res;
+            querytimer.start();
+            bool res = table.contains(queries[j]);
+            querytimer.stop();
+            int real_res = reference.count(queries[j]);
+            if(real_res > 0 && !res)
+                true_ops += 1;
+            if(real_res <= 0 && res)
+                false_ops += 1;
         }
-        querytimer.stop();
 
         auto time = querytimer.elapsed();
-        total_time += time * 1000000;
+        total_time += (time / 1000000000);
         total_ops += max_queries;
     }
-
-    std::cout <<  "[lookup] complete querying " << total_ops << " keys in " << total_time <<"sec\n";
-    printf("[lookup] %.2f M queries / second,  %.2f ns,  f.p.r. = %f\n",
-           ((double)(total_ops)/(total_time *1000000)),
-           ((double) total_time) * 1000000000 / total_ops,
-           1.0 * false_ops / total_ops);
+    std::cout<<"False Positive Percent: "<<((double)false_ops / (double)total_ops)<<std::endl;
+    std::cout<<"True Negative Percent: "<<((double)true_ops / (double)total_ops)<<std::endl;
+    std::cout<<"Looked up "<<total_ops<<" keys in "<<total_time<<" seconds."<<std::endl;
+    std::cout<<"Look up rate: "<<((double)(total_ops) / (double)(total_time))<<std::endl;
+    std::cout<<"----------------------------------------------------------------------------------------"<<std::endl<<std::endl;
+    //std::cout <<  "[lookup] complete querying " << total_ops << " keys in " << total_time <<"sec\n";
+    //printf("[lookup] %.2f M queries / second,  %.2f ns,  f.p.r. = %f\n",
+    //       ((double)(total_ops)/(total_time *1000000)),
+    //       ((double) total_time) * 1000000000 / total_ops,
+    //       1.0 * false_ops / total_ops);
 }
 
 
