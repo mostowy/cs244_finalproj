@@ -51,15 +51,15 @@ void init_keys() {
  * By default it is cuckoo, set 1 for Quotient Filter, set 2 for bloom.
  */
 template <typename HT>
-void time_inserting(int filter_type, std::shared_ptr<HashFamily> family) {
+void time_inserting(size_t bucket_size, std::shared_ptr<HashFamily> family) {
   std::cout<<"----------------Getting insert performance----------------------"<<std::endl;
   init_keys();
-  size_t bucket_size = num_rows;
-  switch(filter_type) {
-    case 1: bucket_size = (1 << 27);
-            break;
-    default: break;
-  }
+  //size_t bucket_size = num_rows;
+  //switch(filter_type) {
+  //  case 1: bucket_size = (1 << 27);
+  //          break;
+  //  default: break;
+  //}
  
   HT table(bucket_size, family);
   size_t i = 0;
