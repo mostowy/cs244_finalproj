@@ -3,51 +3,55 @@
 
 
 QuotientFilter::QuotientFilter(size_t numBuckets, 
-                               std::shared_ptr<HashFamily> family):
-                               buckets(numBuckets, 0){
+                               std::shared_ptr<HashFamily> family){
   fp = family->get();
   //std::vector<int> temp(numBuckets, 0);
   //buckets = temp; 
   numBucks = numBuckets;
-  r = 16;
-  q = 16;
+  r = 9;
+  q = 64 - r;
   std::vector<bool> stat_temp(3*numBuckets, false);
   stat_arr = stat_temp;
   num_elems = 0;
+  buckets = new b_struct[numBuckets];
+  for(int i = 0; i < numBuckets; i++){
+    buckets[i].r = 0;
+  }
 }
 
 QuotientFilter::~QuotientFilter() {
   // TODO implement this
 }
 
-int QuotientFilter::getqr(int f, bool is_q) const {
-  int mask = 0xffffffff;
+int QuotientFilter::getqr(uint64_t f, bool is_q) const {
+  uint64_t mask = 0xffffffffffffffff;
   int ret = 0;
   if(is_q){
       mask = mask << r;
       ret = f & mask;
       ret = (ret >> r);
   }else {
-      mask = mask >> (8*sizeof(int) - r);
+      mask = mask >> (64 - r);
       ret = f & mask;
   }
   return ret;
 }
 
-int QuotientFilter::insert(int data) {
-  int f = fp(data);
+int QuotientFilter::insert(uint64_t data) {
+  uint64_t f = fp(data);
   int q_int = getqr(f, true);
   uint16_t r_int = getqr(f, false);
   size_t bucket = q_int % numBucks;
   
-  // If full, cant insert.
-  if(num_elems == numBucks)
+  float load_factor = .9;
+  // If full to load factor, cant insert.
+  if(num_elems >= (size_t)((float)numBucks * load_factor) + 1)
       return -1;
 
   // If bucket empty, place.
   if(!isFilled(bucket)) {
     num_elems += 1;
-    buckets[bucket] = r_int;
+    buckets[bucket].r = r_int;
     set_3_bit(bucket, true, false, false);
     return 1;
   }
@@ -65,37 +69,37 @@ int QuotientFilter::insert(int data) {
   
   while(isFilled(run_start) == true) {
     if(!inserted) {
-        uint16_t temp = buckets[run_start];
+        uint16_t temp = buckets[run_start].r;
         inserted = true;
         if(first_in_run) {
             stat_arr[(run_start*3) + 1] = false;
             stat_arr[(run_start*3) + 2] = (bucket != run_start);
-            buckets[run_start] = r_int;
+            buckets[run_start].r = r_int;
             r_int = temp;
             last_cont = false;
         }else if(run_over) { 
             stat_arr[(run_start*3) + 1] = true;
             stat_arr[(run_start*3) + 2] = true;
-            buckets[run_start] = r_int;
+            buckets[run_start].r = r_int;
             r_int = temp;
             last_cont = false;
-        }else if((buckets[run_start] > r_int)) {
-            buckets[run_start] = r_int;
+        }else if((buckets[run_start].r > r_int)) {
+            buckets[run_start].r = r_int;
             r_int = temp;
             last_cont = true;
-        } else if(buckets[run_start] == r_int) {
+        } else if(buckets[run_start].r == r_int) {
             return 1;
         }else {
             inserted = false;
         }
     } else {
         // save state
-        uint16_t temp = buckets[run_start];
+        uint16_t temp = buckets[run_start].r;
         bool temp_cont = stat_arr[(run_start*3) + 1];
         stat_arr[(run_start*3) + 1] = last_cont;
         stat_arr[(run_start*3) + 2] = true;
         // shift back
-        buckets[run_start] = r_int;
+        buckets[run_start].r = r_int;
         r_int = temp;
         last_cont = temp_cont;
     }
@@ -105,7 +109,7 @@ int QuotientFilter::insert(int data) {
   }
   
   // Insert
-  buckets[run_start] = r_int;
+  buckets[run_start].r = r_int;
   stat_arr[(run_start*3) + 1] = last_cont;
   if(inserted){
     stat_arr[(run_start*3) + 2] = true;
@@ -118,8 +122,8 @@ int QuotientFilter::insert(int data) {
 }
 
 
-bool QuotientFilter::contains(int data) const {
-  int f = fp(data);
+bool QuotientFilter::contains(uint64_t data) const {
+  uint64_t f = fp(data);
   int q_int = getqr(f, true);
   uint16_t r_int = getqr(f, false);
   size_t bucket = q_int % numBucks;
@@ -138,10 +142,10 @@ bool QuotientFilter::contains(int data) const {
   run_start = find_run(bucket);
   while(isFilled(run_start) == true) {
     // If we hit value, true!!
-    if(buckets[run_start] == r_int)
+    if(buckets[run_start].r == r_int)
       return true;
     // Because we are in sorted order, stop early if greater
-    if(buckets[run_start] > r_int)
+    if(buckets[run_start].r > r_int)
       return false;
     run_start = increment(numBucks, run_start);
     // If our run is over, return false
@@ -153,12 +157,12 @@ bool QuotientFilter::contains(int data) const {
   return false;
 }
 
-bool QuotientFilter::linscan(int data, size_t bucket) const{
-  int f = fp(data);
+bool QuotientFilter::linscan(uint64_t data, size_t bucket) const{
+  uint64_t f = fp(data);
   uint16_t r_int = getqr(f, false);
   size_t spot = bucket;
   do{
-    if(buckets[spot] == r_int)
+    if(buckets[spot].r == r_int)
         return true;
     spot = increment(numBucks, spot);
   }while(spot != bucket);
@@ -180,7 +184,7 @@ bool QuotientFilter::linscan(int data, size_t bucket) const{
   return false;
 }
 
-void QuotientFilter::remove(int data) {
+void QuotientFilter::remove(uint64_t data) {
    // TODO implement this
 }
 
