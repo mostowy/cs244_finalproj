@@ -60,6 +60,7 @@ class DLeftCountingBloomFilter {
   struct subtable subtables_[NUM_SUBTABLES];
   uint32_t num_buckets_per_subtable_;
   HashFunction hash_func_;
+  uint64_t num_inserted_;
   // Hash functions aren't actually valid permutation functions.
   //std::vector<HashFunction> permutations_;
   // Disable copy construction.

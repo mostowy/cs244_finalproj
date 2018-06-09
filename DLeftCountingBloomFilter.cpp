@@ -8,7 +8,8 @@
 DLeftCountingBloomFilter::DLeftCountingBloomFilter(
     uint32_t buckets_per_subtable, std::shared_ptr<HashFamily> family)
     : num_buckets_per_subtable_(buckets_per_subtable),
-      hash_func_(family->get()) {
+      hash_func_(family->get()),
+      num_inserted_(0) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     //permutations_.push_back(family->get());
     subtables_[i].buckets = (struct dlcbf_bucket*)
@@ -65,10 +66,11 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
         if (next_bucket->cells[j].count < CELL_COUNT_MAX_VAL) {
           next_bucket->cells[j].count++;
           //std::cout << +next_bucket->cells[j].count << std::endl;
+          num_inserted_++;
           return 1;
         } else {
           std::cout << "STOP: Cell count overflow." << std::endl;
-          //dump_occupancy();
+          dump_occupancy();
           return -1;
         }
       }
@@ -81,7 +83,13 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
   }
   if (min_fill_count >= BUCKET_HEIGHT) {
     std::cout << "STOP: All target buckets full of other fps." << std::endl;
-    //dump_occupancy();
+    std::cout << "(inserting data " << data << ", fp " << +fingerprint
+              << " b-indexes";
+    for (int i = 0; i < NUM_SUBTABLES; i++) {
+      std::cout << " " << targets[i];
+    }
+    std::cout << ")" << std::endl;
+    dump_occupancy();
     return -1;
   }
   //std::cout << "Placing data " << data << " in subtable " << +best_subtable
@@ -92,6 +100,7 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
   best_bucket->cells[min_fill_count].fingerprint = fingerprint;
   best_bucket->cells[min_fill_count].count = 1;
   //std::cout << "1" << std::endl;
+  num_inserted_++;
   return 1;
 }
 
@@ -141,19 +150,21 @@ void DLeftCountingBloomFilter::remove(uint64_t data) {
 }
 
 void DLeftCountingBloomFilter::dump_occupancy() const {
+  std::cout << "Successful insert() calls: " << num_inserted_ << std::endl;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     for (int j = 0; j < num_buckets_per_subtable_; j++) {
       auto *bucket = &subtables_[i].buckets[j];
+      uint8_t counts[BUCKET_HEIGHT];
+      uint8_t count = 0;
       for (int k = 0; k < BUCKET_HEIGHT; k++) {
-        uint8_t count = bucket->cells[k].count;
-        if (count == 0) {
-        }
-        std::cout << "t" << i << "b" << j << "c" << k;
-        if (count > 0) {
-          std::cout << " fp " << bucket->cells[k].fingerprint << " x"
-                    << +bucket->cells[k].count << std::endl;
-        } else {
-          std::cout << " 0" << std::endl;
+        counts[k] = bucket->cells[k].count;
+        if (counts[k] > 0) count++;
+      }
+      std::cout << "t" << i << " b" << j << ": " << count;
+      for (int k = 0; k < BUCKET_HEIGHT; k++) {
+        if (counts[k] > 0) {
+          std::cout << " " << +bucket->cells[k].fingerprint
+                    << "x" << +bucket->cells[k].count << std::endl;
         }
       }
     }
