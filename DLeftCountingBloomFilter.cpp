@@ -27,9 +27,9 @@ DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
 uint16_t DLeftCountingBloomFilter::get_targets(
     uint64_t data, uint32_t targets[NUM_SUBTABLES]) const {
   uint64_t true_fingerprint = hash_func_(data);
-  //std::cout<<"First line"<<std::endl;
   uint16_t fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
   uint32_t true_target = true_fingerprint >> (8 * sizeof(uint32_t));
+
   for (uint32_t i = 0; i < NUM_SUBTABLES; i++) {
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
     //targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
@@ -38,7 +38,6 @@ uint16_t DLeftCountingBloomFilter::get_targets(
     // This is actually supposed to be a permutation function...
     //targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
   }
-  //std::cout<<"Out of the loop"<<std::endl;
   //uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
 
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint
