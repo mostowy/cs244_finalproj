@@ -40,12 +40,12 @@ class DLeftCountingBloomFilter {
   DLeftCountingBloomFilter(uint32_t buckets_per_subtable,
                            std::shared_ptr<HashFamily> family);
   ~DLeftCountingBloomFilter();
-  int insert(int data);
-  bool contains(int data) const;
-  void remove(int data);
+  int insert(uint64_t data);
+  bool contains(uint64_t data) const;
+  void remove(uint64_t data);
 
  private:
-  uint16_t get_targets(int data, uint32_t targets[NUM_SUBTABLES]) const;
+  uint16_t get_targets(uint64_t data, uint32_t targets[NUM_SUBTABLES]) const;
   struct dlcbf_bucket {
     struct cell {
       uint16_t fingerprint:REMAINDER_BITS;
@@ -57,7 +57,7 @@ class DLeftCountingBloomFilter {
     struct dlcbf_bucket* buckets;
   };
   struct subtable subtables_[NUM_SUBTABLES];
-  uint16_t num_buckets_per_subtable_;
+  uint32_t num_buckets_per_subtable_;
   HashFunction hash_func_;
   // Hash functions aren't actually valid permutation functions.
   //std::vector<HashFunction> permutations_;

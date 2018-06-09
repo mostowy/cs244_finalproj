@@ -25,11 +25,11 @@ DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
 // Populates `targets` (bucket indexes) and returns the fingerprint (what the
 // dlcbf paper calls the "remainder").
 uint16_t DLeftCountingBloomFilter::get_targets(
-    int data, uint32_t targets[NUM_SUBTABLES]) const {
+    uint64_t data, uint32_t targets[NUM_SUBTABLES]) const {
   uint64_t true_fingerprint = hash_func_(data);
   uint16_t fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
   uint32_t true_target = true_fingerprint >> sizeof(uint32_t);
-  for (unsigned i = 0; i < NUM_SUBTABLES; i++) {
+  for (uint32_t i = 0; i < NUM_SUBTABLES; i++) {
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
     //targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
     //    % num_buckets_per_subtable_;
@@ -48,9 +48,9 @@ uint16_t DLeftCountingBloomFilter::get_targets(
   return fingerprint;
 }
 
-int DLeftCountingBloomFilter::insert(int data) {
+int DLeftCountingBloomFilter::insert(uint64_t data) {
   uint32_t targets[NUM_SUBTABLES];
-  uint16_t fingerprint = get_targets(data, &targets[0]);
+  uint16_t fingerprint = get_targets(data, targets);
   uint8_t min_fill_count = BUCKET_HEIGHT;
   uint8_t best_subtable = 0;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
@@ -92,9 +92,9 @@ int DLeftCountingBloomFilter::insert(int data) {
   return 1;
 }
 
-bool DLeftCountingBloomFilter::contains(int data) const {
+bool DLeftCountingBloomFilter::contains(uint64_t data) const {
   uint32_t targets[NUM_SUBTABLES];
-  uint16_t fingerprint = get_targets(data, &targets[0]);
+  uint16_t fingerprint = get_targets(data, targets);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
     for (int j = 0;
@@ -111,9 +111,9 @@ bool DLeftCountingBloomFilter::contains(int data) const {
   return false;
 }
 
-void DLeftCountingBloomFilter::remove(int data) {
+void DLeftCountingBloomFilter::remove(uint64_t data) {
   uint32_t targets[NUM_SUBTABLES];
-  uint16_t fingerprint = get_targets(data, &targets[0]);
+  uint16_t fingerprint = get_targets(data, targets);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
     for (int j = 0;
