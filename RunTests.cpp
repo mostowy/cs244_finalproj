@@ -106,13 +106,13 @@ int main() {
   std::cout << "Correctness Tests" << std::endl;
   std::cout<<"##################  Cuckoo Filter Test  ##################"<<std::endl;
   std::cout<<"##########################################################"<<std::endl;
-  //time_inserting<CuckooFilter>(33554432, *std::begin(allHashFamilies));
+  time_inserting<CuckooFilter>(1<<25, *std::begin(allHashFamilies));
   std::cout<<"#############  Semi Sort Cuckoo Filter Test  #############"<<std::endl;
   std::cout<<"##########################################################"<<std::endl;
-  //time_inserting<SSCuckooFilter>(36604834, *std::begin(allHashFamilies));
+  time_inserting<SSCuckooFilter>(1<<25, *std::begin(allHashFamilies));
   std::cout<<"#################  Quotient Filter Test  #################"<<std::endl;
   std::cout<<"##########################################################"<<std::endl;
-  //time_inserting<QuotientFilter>(134217728, *std::begin(allHashFamilies));
+  time_inserting<QuotientFilter>(1<<27, *std::begin(allHashFamilies));
   std::cout<<"###################  Bloom Filter Test  ##################"<<std::endl;
   std::cout<<"##########################################################"<<std::endl;
   //time_inserting<BloomFilter>(1610612736, *std::begin(allHashFamilies));
