@@ -40,12 +40,12 @@ class DLeftCountingBloomFilter {
   DLeftCountingBloomFilter(uint32_t buckets_per_subtable,
                            std::shared_ptr<HashFamily> family);
   ~DLeftCountingBloomFilter();
-  int insert(int data);
-  bool contains(int data) const;
-  void remove(int data);
+  int insert(uint64_t data);
+  bool contains(uint64_t data) const;
+  void remove(uint64_t data);
 
  private:
-  uint16_t get_targets(int data, uint32_t targets[NUM_SUBTABLES]) const;
+  uint16_t get_targets(uint64_t data, uint32_t targets[NUM_SUBTABLES]) const;
   struct dlcbf_bucket {
     struct cell {
       uint16_t fingerprint:REMAINDER_BITS;
