@@ -57,7 +57,7 @@ class DLeftCountingBloomFilter {
     struct dlcbf_bucket* buckets;
   };
   struct subtable subtables_[NUM_SUBTABLES];
-  uint16_t num_buckets_per_subtable_;
+  uint32_t num_buckets_per_subtable_;
   HashFunction hash_func_;
   // Hash functions aren't actually valid permutation functions.
   //std::vector<HashFunction> permutations_;
