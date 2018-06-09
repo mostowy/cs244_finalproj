@@ -27,15 +27,18 @@ DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
 uint16_t DLeftCountingBloomFilter::get_targets(
     int data, uint32_t targets[NUM_SUBTABLES]) const {
   uint64_t true_fingerprint = hash_func_(data);
-  uint16_t hidden_fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
-  for (int i = 0; i < NUM_SUBTABLES; i++) {
+  uint16_t fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
+  uint32_t true_target = true_fingerprint >> sizeof(uint32_t);
+  for (unsigned i = 0; i < NUM_SUBTABLES; i++) {
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
-    targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
-        % num_buckets_per_subtable_;
+    //targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
+    //    % num_buckets_per_subtable_;
+    targets[i] = (true_target + i * fingerprint) % num_buckets_per_subtable_;
     // This is actually supposed to be a permutation function...
     //targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
   }
-  uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
+  //uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
+
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint
   //          << ", slots: ";
   //for (int i = 0; i < NUM_SUBTABLES; i++) {
@@ -53,9 +56,16 @@ int DLeftCountingBloomFilter::insert(int data) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *next_bucket = &subtables_[i].buckets[targets[i]];
     for (int j = 0; j < next_bucket->fill_count; j++) {
-      if (next_bucket->fingerprints[j] == fingerprint) {
+      if (next_bucket->cells[j].fingerprint == fingerprint) {
         // Already included in the table.
-        return 1;
+        if (next_bucket->cells[j].count < CELL_COUNT_MAX_VAL) {
+          next_bucket->cells[j].count++;
+          //std::cout << +next_bucket->cells[j].count << std::endl;
+          return 1;
+        } else {
+          //std::cout << "Cell count overflow." << std::endl;
+          return -1;
+        }
       }
     }
     if (i == 0 || next_bucket->fill_count < min_fill_count) {
@@ -64,6 +74,7 @@ int DLeftCountingBloomFilter::insert(int data) {
     }
   }
   if (min_fill_count >= BUCKET_HEIGHT) {
+    //std::cout << "All target buckets full of other fps." << std::endl;
     return -1;
   }
   //std::cout << "Placing data " << data << " in subtable " << +best_subtable
@@ -71,8 +82,10 @@ int DLeftCountingBloomFilter::insert(int data) {
   //          << +min_fill_count << " full." << std::endl;
   auto* best_bucket =
       &subtables_[best_subtable].buckets[targets[best_subtable]];
-  best_bucket->fingerprints[min_fill_count] = fingerprint;
+  best_bucket->cells[min_fill_count].fingerprint = fingerprint;
+  best_bucket->cells[min_fill_count].count = 1;
   best_bucket->fill_count++;
+  //std::cout << "1" << std::endl;
   return 1;
 }
 
@@ -82,7 +95,7 @@ bool DLeftCountingBloomFilter::contains(int data) const {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
     for (int j = 0; j < bucket->fill_count; j++) {
-      if (bucket->fingerprints[j] == fingerprint) {
+      if (bucket->cells[j].fingerprint == fingerprint) {
         //std::cout << "Found data " << data << " in subtable " << i
         //    << " bucket " << targets[i] << " slot "
         //    << j << " (" << +bucket->fill_count << " full)." << std::endl;
@@ -99,10 +112,15 @@ void DLeftCountingBloomFilter::remove(int data) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
     for (int j = 0; j < bucket->fill_count; j++) {
-      if (bucket->fingerprints[j] == fingerprint) {
+      if (bucket->cells[j].fingerprint == fingerprint) {
+        if (bucket->cells[j].count >= 2) {
+          bucket->cells[j].count--;
+          return;
+        }
         // Shift the rest of the bucket over.
         for (int k = j + 1; k < bucket->fill_count; k++) {
-          bucket->fingerprints[k-1] = bucket->fingerprints[k];
+          bucket->cells[k-1].fingerprint = bucket->cells[k].fingerprint;
+          bucket->cells[k-1].count = bucket->cells[k].count;
         }
         bucket->fill_count--;
         return;
