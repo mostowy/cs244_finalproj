@@ -27,6 +27,7 @@ DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
 uint16_t DLeftCountingBloomFilter::get_targets(
     uint64_t data, uint32_t targets[NUM_SUBTABLES]) const {
   uint64_t true_fingerprint = hash_func_(data);
+  //std::cout<<"First line"<<std::endl;
   uint16_t fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
   uint32_t true_target = true_fingerprint >> (8 * sizeof(uint32_t));
   for (uint32_t i = 0; i < NUM_SUBTABLES; i++) {
@@ -37,6 +38,7 @@ uint16_t DLeftCountingBloomFilter::get_targets(
     // This is actually supposed to be a permutation function...
     //targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
   }
+  //std::cout<<"Out of the loop"<<std::endl;
   //uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
 
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint
@@ -99,7 +101,7 @@ bool DLeftCountingBloomFilter::contains(uint64_t data) const {
   uint16_t fingerprint = get_targets(data, targets);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
-    for (int j = 0;
+    for (size_t j = 0;
          j < num_buckets_per_subtable_ && bucket->cells[j].count > 0;
          j++) {
       if (bucket->cells[j].fingerprint == fingerprint) {
@@ -118,7 +120,7 @@ void DLeftCountingBloomFilter::remove(uint64_t data) {
   uint16_t fingerprint = get_targets(data, targets);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
-    for (int j = 0;
+    for (size_t j = 0;
          j < num_buckets_per_subtable_ && bucket->cells[j].count > 0;
          j++) {
       if (bucket->cells[j].fingerprint == fingerprint) {
@@ -127,7 +129,7 @@ void DLeftCountingBloomFilter::remove(uint64_t data) {
           return;
         }
         // Shift the rest of the bucket over.
-        for (int k = j + 1; k < num_buckets_per_subtable_; k++) {
+        for (size_t k = j + 1; k < num_buckets_per_subtable_; k++) {
           bucket->cells[k-1].fingerprint = bucket->cells[k].fingerprint;
           bucket->cells[k-1].count = bucket->cells[k].count;
           if (bucket->cells[k].count == 0) break;
