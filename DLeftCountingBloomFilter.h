@@ -10,45 +10,34 @@
 // Allowed range: 1 to 255. The dlcbf paper used 8; the cuckoo paper used 4.
 #define BUCKET_HEIGHT 4
 // Allowed range: 1 to 16 bits. The dlcbf paper used 14; the cuckoo paper
-// does not specify. (The Cuckoo paper used 12 bits for the Cuckoo filter
-// fingerprints.)
+// does not specify, except to say that each "entry" (i.e. cell) is 12 bits.
+// Most likely, this means that they used 8 bits per fingerprint.
+// (Interestingly, the Cuckoo paper used 12 bits per fingerprint for the
+// Cuckoo filter fingerprints.)
 // This determines what bits of the hash comprise the "remainder".
 #define REMAINDER_BITS 8
 #define REMAINDER_MASK 0x00ff
-#define CELL_COUNT_BITS 3
-#define CELL_COUNT_MAX_VAL 0x7
+#define CELL_COUNT_BITS 4
+#define CELL_COUNT_MAX_VAL 0xf
 
 /*
   Cuckoo filter paper:
-  105M inserts in 192MB memory
-  Assume 75% cell occupancy. Then:
-  # cells = 105M / .75 = 140M
-  # buckets = 140M / 4 = 35M
-  # buckets/table = 35M / 4 = 9M
+  2^25 total buckets
+  4 entries per bucket
+  12 bits per entry
+  ... so probably 8 bits per fingerprint (+/- 2)
+  ... so probably 4 bits per counter (+/- 2)
+  This yields 192MB total memory footprint.
 
-  # bits/cell = 192MB / 140M = 11
-  That means that fingerprints are pretty small!
-  Probably 11 bits = 8-bit fingerprint + 3-bit counter.
-
-
-  Mirror the above calculations for our own impl
-
-  8+3 bits per cell
-  4 cells per bucket
-  BUCK buckets per subtable
-  4 tables per dlcbf
-
-  1 dlcbf = 1 dlcbf * 4 t/dlcbf * BUCK b/t * 4 c/b * 11 bits/c = 192MB
-  176*BUCK bits = 192MB
-  22*BUCK bytes = 192MB
-  BUCK = 192 * 1024 * 1024 / 22
-       = 9151208
+  2^25 total buckets / dlcbf / (4 subtables / dlcbf)
+  = 2^23 buckets / subtable
+  = 8388608 buckets / subtable
 */
 
 class DLeftCountingBloomFilter {
  public:
-  // To get 192MB like the Cuckoo filter paper, pass in this value:
-  //   9151208
+  // To get 192MB like the Cuckoo filter paper, pass in (2^25 / 4), or:
+  //   8388608
   // (See above for the calculation)
   DLeftCountingBloomFilter(uint32_t buckets_per_subtable,
                            std::shared_ptr<HashFamily> family);
