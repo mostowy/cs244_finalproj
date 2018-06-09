@@ -54,12 +54,6 @@ template <typename HT>
 void time_inserting(size_t bucket_size, std::shared_ptr<HashFamily> family) {
   std::cout<<"----------------Getting insert performance----------------------"<<std::endl;
   init_keys();
-  //size_t bucket_size = num_rows;
-  //switch(filter_type) {
-  //  case 1: bucket_size = (1 << 27);
-  //          break;
-  //  default: break;
-  //}
  
   HT table(bucket_size, family);
   size_t i = 0;
@@ -85,7 +79,7 @@ void time_inserting(size_t bucket_size, std::shared_ptr<HashFamily> family) {
 template <typename HT>
 void time_lookup(std::shared_ptr<HashFamily> family, HT& table){
     std::cout<<"----------------------Getting lookup performance----------------------"<<std::endl;
-    float pos_frac = .5;
+    float pos_frac = .4;
     size_t max_queries = 10000000;
     auto queries = new uint64_t[max_queries];
     std::random_device rd;
@@ -121,10 +115,12 @@ void time_lookup(std::shared_ptr<HashFamily> family, HT& table){
             bool res = table.contains(queries[j]);
             querytimer.stop();
             int real_res = reference.count(queries[j]);
-            if(real_res > 0 && !res)
+            if(real_res > 0 && !res){
                 true_ops += 1;
-            if(real_res <= 0 && res)
+	    }
+	    if(real_res <= 0 && res){
                 false_ops += 1;
+	    }
         }
 
         auto time = querytimer.elapsed();
