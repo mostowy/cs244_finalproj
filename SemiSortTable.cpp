@@ -104,11 +104,7 @@ bool SemiSortTable::check_val(uint32_t f, int i) const{
 void SemiSortTable::readInEntries(int i1, uint32_t entries[4]) const{
     buck_struct b = buckets[i1];
     uint16_t index = b.index;
-    //std::cout<<"Read in index: "<<index<<std::endl;
     uint16_t nums = perm.decode(index);
-    //std::cout<<"Read in nums val: "<<nums<<std::endl;
-    //std::bitset<16> x(nums);
-    //std::cout<<"Read in nums bits: "<<x<<std::endl;
     
     uint32_t mask = 0x0000000F;
     for(size_t j = 0; j < 4; j++) {
@@ -131,32 +127,7 @@ void SemiSortTable::readInEntries(int i1, uint32_t entries[4]) const{
         high_bits = high_bits << 4;
         val = val + high_bits;
         entries[j] = val;
-        /*// Now get high bits
-        size_t added_bytes = 0;
-
-        // Number of bits to shift forward by.  Must be less than
-        size_t forward_shift = 12 + (bits_per_entry * j);
-        while((forward_shift + bits_per_entry) > 64){
-            added_bytes += 1;
-            forward_shift -= 8;
-        }
-
-        uint64_t high_num = bits_mask & *(buckets + (bytes_per_bucket*i1) + added_bytes);
-        // First shift bits forward to get high bits at end of num
-        high_num = high_num << forward_shift;
-        // Now shift bits back to get bits at beginning of num
-        high_num = high_num >> (64 - bits_per_entry);
-        // Now mask off leading 32 bits
-        uint32_t t_high_num = high_num & 0xffffffff;
-        // Now shift forward by 4
-        val = val + (t_high_num << 4);
-        entries[j] = val;
-        */
     }
-    //std::cout<<"IN READ"<<std::endl;
-    //for(int i = 0; i < 4; i++) {
-    //    std::cout<<"Entry Number"<<i<<": "<<entries[i]<<std::endl;
-    //}
 }
 
 void SemiSortTable::swapEntries(uint32_t& e1, uint32_t& e2){
