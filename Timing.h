@@ -79,7 +79,7 @@ void time_inserting(size_t bucket_size, std::shared_ptr<HashFamily> family) {
 template <typename HT>
 void time_lookup(std::shared_ptr<HashFamily> family, HT& table){
     std::cout<<"----------------------Getting lookup performance----------------------"<<std::endl;
-    float pos_frac = .4;
+    float pos_frac = .5;
     size_t max_queries = 10000000;
     auto queries = new uint64_t[max_queries];
     std::random_device rd;
@@ -158,8 +158,6 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
   double false_pos = 0;
   std::cout<<"Num Buckets: "<<buckets<<std::endl;
   while(true) {
-    if(std::fmod(total, 1000) == 0)
-        std::cout<<"Elem number: "<<total<<std::endl;
     uint32_t value = gen(engine);
     //std::cout<<"Inserting value: "<<value<<std::endl;
     int val = table.insert(value);
