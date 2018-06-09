@@ -11,7 +11,6 @@ DLeftCountingBloomFilter::DLeftCountingBloomFilter(
       hash_func_(family->get()),
       num_inserted_(0) {
   for (int i = 0; i < NUM_SUBTABLES; i++) {
-    //permutations_.push_back(family->get());
     subtables_[i].buckets = (struct dlcbf_bucket*)
         calloc(sizeof(struct dlcbf_bucket), num_buckets_per_subtable_);
   }
@@ -35,11 +34,9 @@ uint16_t DLeftCountingBloomFilter::get_targets(
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
     //targets[i] = (hidden_fingerprint * PRIME1 * (i+1) + PRIME2)
     //    % num_buckets_per_subtable_;
-    targets[i] = (true_target + (i*2+1) * fingerprint) % num_buckets_per_subtable_;
-    // This is actually supposed to be a permutation function...
-    //targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
+    targets[i] =
+        (true_target + (i*2+1) * fingerprint) % num_buckets_per_subtable_;
   }
-  //uint16_t fingerprint = true_fingerprint & REMAINDER_MASK;
 
   //std::cout << "Data " << data << " hashes to fp " << +fingerprint
   //          << ", slots: ";
@@ -69,8 +66,14 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
           num_inserted_++;
           return 1;
         } else {
-          std::cout << "STOP: Cell count overflow." << std::endl;
-          dump_occupancy();
+          //std::cout << "STOP: Cell count overflow." << std::endl;
+          //std::cout << "(was inserting data " << data << ", fp " << +fingerprint
+          //          << " b-indexes";
+          //for (int i = 0; i < NUM_SUBTABLES; i++) {
+          //  std::cout << " " << targets[i];
+          //}
+          //std::cout << ")" << std::endl;
+          //dump_occupancy();
           return -1;
         }
       }
@@ -82,14 +85,14 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
     }
   }
   if (min_fill_count >= BUCKET_HEIGHT) {
-    std::cout << "STOP: All target buckets full of other fps." << std::endl;
-    std::cout << "(inserting data " << data << ", fp " << +fingerprint
-              << " b-indexes";
-    for (int i = 0; i < NUM_SUBTABLES; i++) {
-      std::cout << " " << targets[i];
-    }
-    std::cout << ")" << std::endl;
-    dump_occupancy();
+    //std::cout << "STOP: All target buckets full of other fps." << std::endl;
+    //std::cout << "(was inserting data " << data << ", fp " << +fingerprint
+    //          << " b-indexes";
+    //for (int i = 0; i < NUM_SUBTABLES; i++) {
+    //  std::cout << " " << targets[i];
+    //}
+    //std::cout << ")" << std::endl;
+    //dump_occupancy();
     return -1;
   }
   //std::cout << "Placing data " << data << " in subtable " << +best_subtable
@@ -151,6 +154,10 @@ void DLeftCountingBloomFilter::remove(uint64_t data) {
 
 void DLeftCountingBloomFilter::dump_occupancy() const {
   std::cout << "Successful insert() calls: " << num_inserted_ << std::endl;
+  std::cout << "Overall cell occupancy: "
+            << (1.0 * num_inserted_ /
+                (NUM_SUBTABLES * num_buckets_per_subtable_ * BUCKET_HEIGHT))
+            << std::endl;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     for (int j = 0; j < num_buckets_per_subtable_; j++) {
       auto *bucket = &subtables_[i].buckets[j];
@@ -160,13 +167,14 @@ void DLeftCountingBloomFilter::dump_occupancy() const {
         counts[k] = bucket->cells[k].count;
         if (counts[k] > 0) count++;
       }
-      std::cout << "t" << i << " b" << j << ": " << count;
+      std::cout << "t" << i << " b" << j << ": " << +count;
       for (int k = 0; k < BUCKET_HEIGHT; k++) {
         if (counts[k] > 0) {
-          std::cout << " " << +bucket->cells[k].fingerprint
-                    << "x" << +bucket->cells[k].count << std::endl;
+          std::cout << " " << +(bucket->cells[k].fingerprint)
+                    << "x" << +(bucket->cells[k].count) << ",";
         }
       }
+      std::cout << std::endl;
     }
   }
 }
