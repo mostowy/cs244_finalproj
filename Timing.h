@@ -102,6 +102,7 @@ void time_lookup(std::shared_ptr<HashFamily> family, HT& table){
     }
 
     size_t false_ops  = 0;
+    size_t false_o = 0;
     size_t true_ops = 0;
     size_t total_ops = 0;
     double total_time = 0;
@@ -121,22 +122,24 @@ void time_lookup(std::shared_ptr<HashFamily> family, HT& table){
 	    if(real_res <= 0 && res){
                 false_ops += 1;
 	    }
+	    if(res)
+	        false_o += 1;
         }
 
         auto time = querytimer.elapsed();
         total_time += (time / 1000000000);
         total_ops += max_queries;
     }
-    std::cout<<"False Positive Percent: "<<((double)false_ops / (double)total_ops)<<std::endl;
+    std::cout<<"False Positive Percent: "<<((double)false_ops / ((double)total_ops*(1 - pos_frac))<<std::endl;
     std::cout<<"True Negative Percent: "<<((double)true_ops / (double)total_ops)<<std::endl;
     std::cout<<"Looked up "<<total_ops<<" keys in "<<total_time<<" seconds."<<std::endl;
     std::cout<<"Look up rate: "<<((double)(total_ops) / (double)(total_time))<<std::endl;
     std::cout<<"----------------------------------------------------------------------------------------"<<std::endl<<std::endl;
-    //std::cout <<  "[lookup] complete querying " << total_ops << " keys in " << total_time <<"sec\n";
-    //printf("[lookup] %.2f M queries / second,  %.2f ns,  f.p.r. = %f\n",
-    //       ((double)(total_ops)/(total_time *1000000)),
-    //       ((double) total_time) * 1000000000 / total_ops,
-    //       1.0 * false_ops / total_ops);
+    std::cout <<  "[lookup] complete querying " << total_ops << " keys in " << total_time <<"sec\n";
+    printf("[lookup] %.2f M queries / second,  %.2f ns,  f.p.r. = %f\n",
+          ((double)(total_ops)/(total_time *1000000)),
+           ((double) total_time) * 1000000000 / total_ops,
+           (false_o / total_ops) - pos_frac);
 }
 
 
