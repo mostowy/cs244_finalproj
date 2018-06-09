@@ -158,8 +158,6 @@ bool checkCorrectness(size_t buckets, std::shared_ptr<HashFamily> family, size_t
   double false_pos = 0;
   std::cout<<"Num Buckets: "<<buckets<<std::endl;
   while(true) {
-    if(std::fmod(total, 1000) == 0)
-        std::cout<<"Elem number: "<<total<<std::endl;
     uint32_t value = gen(engine);
     //std::cout<<"Inserting value: "<<value<<std::endl;
     int val = table.insert(value);
