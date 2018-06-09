@@ -14,6 +14,8 @@ DLeftCountingBloomFilter::DLeftCountingBloomFilter(
     subtables_[i].buckets = (struct dlcbf_bucket*)
         calloc(sizeof(struct dlcbf_bucket), num_buckets_per_subtable_);
   }
+  std::cout<<"Number of subtables "<<NUM_SUBTABLES<<std::endl;
+  std::cout<<"Buckets per subtable"<<buckets_per_subtable<<std::endl;
 }
 
 DLeftCountingBloomFilter::~DLeftCountingBloomFilter() {
@@ -28,7 +30,7 @@ uint16_t DLeftCountingBloomFilter::get_targets(
     uint64_t data, uint32_t targets[NUM_SUBTABLES]) const {
   uint64_t true_fingerprint = hash_func_(data);
   //std::cout<<"First line"<<std::endl;
-  uint16_t fingerprint = ((uint16_t) true_fingerprint) & REMAINDER_MASK;
+  uint16_t fingerprint = ( true_fingerprint) & REMAINDER_MASK;
   uint32_t true_target = true_fingerprint >> sizeof(uint32_t);
   for (uint32_t i = 0; i < NUM_SUBTABLES; i++) {
     //targets[i] = (true_fingerprint * (2*i+1)) % num_buckets_per_subtable_;
@@ -41,7 +43,7 @@ uint16_t DLeftCountingBloomFilter::get_targets(
    // std::cout<<"num buckets per subtable"<<num_buckets_per_subtable_<<std::endl;
     //test = test % num_buckets_per_subtable_;
     //std::cout<<"third doen"<<std::endl;
-    targets[i] = (true_target + i * fingerprint) % num_buckets_per_subtable_;
+    targets[i] = (true_target + i*fingerprint) % num_buckets_per_subtable_;
     // This is actually supposed to be a permutation function...
     //targets[i] = permutations_[i](true_fingerprint) % num_buckets_per_subtable_;
   }

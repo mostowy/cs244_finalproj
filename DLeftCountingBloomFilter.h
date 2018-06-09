@@ -16,7 +16,7 @@
 #define REMAINDER_BITS 12
 #define REMAINDER_MASK 0x0fff
 #define CELL_COUNT_BITS 4
-#define CELL_COUNT_MAX_VAL 0xf
+#define CELL_COUNT_MAX_VAL 0xff
 
 /*
   16 bits per cell
