@@ -47,7 +47,6 @@ class DLeftCountingBloomFilter {
  private:
   uint16_t get_targets(int data, uint32_t targets[NUM_SUBTABLES]) const;
   struct dlcbf_bucket {
-    uint8_t fill_count;
     struct cell {
       uint16_t fingerprint:REMAINDER_BITS;
       uint8_t count:CELL_COUNT_BITS;

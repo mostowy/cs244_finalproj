@@ -55,7 +55,10 @@ int DLeftCountingBloomFilter::insert(int data) {
   uint8_t best_subtable = 0;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *next_bucket = &subtables_[i].buckets[targets[i]];
-    for (int j = 0; j < next_bucket->fill_count; j++) {
+    uint8_t next_fill_count = 0;
+    for (int j = 0;
+         j < num_buckets_per_subtable_ && next_bucket->cells[j].count > 0;
+         j++) {
       if (next_bucket->cells[j].fingerprint == fingerprint) {
         // Already included in the table.
         if (next_bucket->cells[j].count < CELL_COUNT_MAX_VAL) {
@@ -67,9 +70,10 @@ int DLeftCountingBloomFilter::insert(int data) {
           return -1;
         }
       }
+      next_fill_count++;
     }
-    if (i == 0 || next_bucket->fill_count < min_fill_count) {
-      min_fill_count = next_bucket->fill_count;
+    if (i == 0 || next_fill_count < min_fill_count) {
+      min_fill_count = next_fill_count;
       best_subtable = i;
     }
   }
@@ -84,7 +88,6 @@ int DLeftCountingBloomFilter::insert(int data) {
       &subtables_[best_subtable].buckets[targets[best_subtable]];
   best_bucket->cells[min_fill_count].fingerprint = fingerprint;
   best_bucket->cells[min_fill_count].count = 1;
-  best_bucket->fill_count++;
   //std::cout << "1" << std::endl;
   return 1;
 }
@@ -94,7 +97,9 @@ bool DLeftCountingBloomFilter::contains(int data) const {
   uint16_t fingerprint = get_targets(data, &targets[0]);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
-    for (int j = 0; j < bucket->fill_count; j++) {
+    for (int j = 0;
+         j < num_buckets_per_subtable_ && bucket->cells[j].count > 0;
+         j++) {
       if (bucket->cells[j].fingerprint == fingerprint) {
         //std::cout << "Found data " << data << " in subtable " << i
         //    << " bucket " << targets[i] << " slot "
@@ -111,18 +116,21 @@ void DLeftCountingBloomFilter::remove(int data) {
   uint16_t fingerprint = get_targets(data, &targets[0]);
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *bucket = &subtables_[i].buckets[targets[i]];
-    for (int j = 0; j < bucket->fill_count; j++) {
+    for (int j = 0;
+         j < num_buckets_per_subtable_ && bucket->cells[j].count > 0;
+         j++) {
       if (bucket->cells[j].fingerprint == fingerprint) {
         if (bucket->cells[j].count >= 2) {
           bucket->cells[j].count--;
           return;
         }
         // Shift the rest of the bucket over.
-        for (int k = j + 1; k < bucket->fill_count; k++) {
+        for (int k = j + 1; k < num_buckets_per_subtable_; k++) {
           bucket->cells[k-1].fingerprint = bucket->cells[k].fingerprint;
           bucket->cells[k-1].count = bucket->cells[k].count;
+          if (bucket->cells[k].count == 0) break;
+          bucket->cells[k].count = 0;
         }
-        bucket->fill_count--;
         return;
       }
     }
