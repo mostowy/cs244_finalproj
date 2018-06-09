@@ -1,5 +1,5 @@
 #include "DLeftCountingBloomFilter.h"
-//#include <iostream>
+#include <iostream>
 
 // Arbitrary prime number, used as a linear permutation function.
 #define PRIME1 9199
@@ -53,9 +53,11 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
   uint16_t fingerprint = get_targets(data, targets);
   uint8_t min_fill_count = BUCKET_HEIGHT;
   uint8_t best_subtable = 0;
+  std::cout<<"Before For loop"<<std::endl;
   for (int i = 0; i < NUM_SUBTABLES; i++) {
     auto *next_bucket = &subtables_[i].buckets[targets[i]];
     uint8_t next_fill_count = 0;
+    std::cout<<"Before Second loop"<<std::endl;
     for (int j = 0;
          j < num_buckets_per_subtable_ && next_bucket->cells[j].count > 0;
          j++) {
@@ -84,6 +86,7 @@ int DLeftCountingBloomFilter::insert(uint64_t data) {
   //std::cout << "Placing data " << data << " in subtable " << +best_subtable
   //          << " bucket " << +targets[best_subtable] << " which was "
   //          << +min_fill_count << " full." << std::endl;
+  std::cout<<"Placing data"<<std::endl;
   auto* best_bucket =
       &subtables_[best_subtable].buckets[targets[best_subtable]];
   best_bucket->cells[min_fill_count].fingerprint = fingerprint;
